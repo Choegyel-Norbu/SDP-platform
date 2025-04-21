@@ -13,13 +13,13 @@ public class Address {
 	private String state;
 	private String postCode;
 	private String subarb;
-	private int unit;
+	private String unit;
 	private String unitNumber;
 	private String streetType;
 	private Double latitude;
 	private Double longitude;
-	
-	 @OneToOne(mappedBy = "address")
+
+	@OneToOne(mappedBy = "address")
 	private Client client;
 
 	public Address() {
@@ -66,12 +66,20 @@ public class Address {
 		this.subarb = subarb;
 	}
 
-	public int getUnit() {
+	public String getUnit() {
 		return unit;
 	}
 
-	public void setUnit(int unit) {
+	public void setUnit(String unit) {
 		this.unit = unit;
+	}
+
+	public Client getClient() {
+		return client;
+	}
+
+	public void setClient(Client client) {
+		this.client = client;
 	}
 
 	public String getUnitNumber() {

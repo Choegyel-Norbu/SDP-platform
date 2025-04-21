@@ -7,7 +7,7 @@ public class AddressDTO {
 	private String state;
 	private String postCode;
 	private String subarb;
-	private int unit;
+	private String unit;
 	private String unitNumber;
 	private String streetType;
 	private Double latitude;
@@ -53,11 +53,11 @@ public class AddressDTO {
 		this.subarb = subarb;
 	}
 
-	public int getUnit() {
+	public String getUnit() {
 		return unit;
 	}
 
-	public void setUnit(int unit) {
+	public void setUnit(String unit) {
 		this.unit = unit;
 	}
 

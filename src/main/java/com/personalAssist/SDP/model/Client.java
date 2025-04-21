@@ -18,10 +18,10 @@ public class Client {
 
 	@OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
 	private List<ServiceRequest> request;
-	
+
 	@OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id", referencedColumnName = "id")
-    private Address address;
+	@JoinColumn(name = "address_id", referencedColumnName = "id")
+	private Address address;
 
 	@OneToOne
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -94,6 +94,5 @@ public class Client {
 	public void setAddress(Address address) {
 		this.address = address;
 	}
-	
 
 }

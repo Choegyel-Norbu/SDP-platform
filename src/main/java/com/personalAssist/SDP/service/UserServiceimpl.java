@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.personalAssist.SDP.dto.ClientDTO;
 import com.personalAssist.SDP.dto.UserDTO;
+import com.personalAssist.SDP.enums.UserRole;
 import com.personalAssist.SDP.model.Client;
 import com.personalAssist.SDP.model.User;
 import com.personalAssist.SDP.repository.ClientRepository;
@@ -34,6 +35,7 @@ public class UserServiceimpl implements UserService {
 	public UserDTO register(UserDTO userDTO) {
 		User user = UserWrapper.toEntity(userDTO);
 		user.setPassword(PasswordEncoder.encode(userDTO.getPassword()));
+		user.setRole(UserRole.USER);
 
 		return UserWrapper.toDTO(userRepository.save(user));
 	}

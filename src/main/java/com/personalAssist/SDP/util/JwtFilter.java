@@ -12,8 +12,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class JwtFilter implements Filter {
 
-	private static final String[] AUTH_WHITELIST = { "/auth/login", // Login endpoint
-			"/api/registration", "/api/addServices", "/api/getServices" // Registration endpoint
+	private static final String[] AUTH_WHITELIST = { "/auth/login", "/auth/sendOtp", "/auth/verifyOtp",
+			"/api/registration"
 	};
 
 	@Override
@@ -24,6 +24,12 @@ public class JwtFilter implements Filter {
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
 
 		String path = httpRequest.getRequestURI();
+
+		if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
+			httpResponse.setStatus(HttpServletResponse.SC_OK);
+			chain.doFilter(httpRequest, httpResponse);
+			return;
+		}
 
 		if (isPathInWhitelist(path)) {
 			chain.doFilter(httpRequest, httpResponse);

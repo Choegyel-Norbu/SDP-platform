@@ -12,6 +12,8 @@ import com.personalAssist.SDP.dto.ServiceRequestDTO;
 import com.personalAssist.SDP.enums.Priority;
 import com.personalAssist.SDP.enums.RepeatFrequency;
 import com.personalAssist.SDP.enums.Status;
+import com.personalAssist.SDP.interfaces.ClientAddressProjection;
+import com.personalAssist.SDP.interfaces.ServiceRequestProjection;
 import com.personalAssist.SDP.model.Address;
 import com.personalAssist.SDP.model.Client;
 import com.personalAssist.SDP.model.ServiceRequest;
@@ -69,6 +71,7 @@ public class ClientServiceImpl implements ClientService {
 		withPriority(service, dto.getPriority());
 		service.setStatus(associateStatus(service));
 		serviceFrequency(service, dto.getRepeatFrequency());
+		service.setServiceType(dto.getServiceType());
 
 		return serviceRequestRepository.save(service) != null;
 	}
@@ -119,15 +122,12 @@ public class ClientServiceImpl implements ClientService {
 
 	private Address saveAddress(AddressDTO dto) {
 		Address address = new Address();
-		address.setLatitude(dto.getLatitude());
-		address.setLongitude(dto.getLongitude());
-		address.setPostCode(dto.getPostCode());
 		address.setState(dto.getState());
 		address.setStreetAddress(dto.getStreetAddress());
 		address.setStreetType(dto.getStreetType());
 		address.setSubarb(dto.getSubarb());
 		address.setUnit(dto.getUnit());
-		address.setUnitNumber(dto.getUnitNumber());
+//		address.setUnitNumber(dto.getUnitNumber());
 
 		return addressRepository.save(address);
 	}
@@ -149,12 +149,33 @@ public class ClientServiceImpl implements ClientService {
 	public List<ServiceRequestDTO> getAllServices() {
 		List<ServiceRequest> dto = serviceRequestRepository.findAll();
 		List<ServiceRequestDTO> responseDTO = new ArrayList<>();
-		for(ServiceRequest service : dto) {
+		for (ServiceRequest service : dto) {
 			ServiceRequestDTO convert = UserWrapper.toServiceDTO(service);
 			responseDTO.add(convert);
 		}
-		
+
 		return responseDTO;
+	}
+
+	@Override
+	public List<ServiceRequestProjection> getServices() {
+		return serviceRequestRepository.findAllServiceRequestsWithStatus();
+
+	}
+
+	@Override
+	public long countServiceRequest() {
+		return serviceRequestRepository.count();
+	}
+
+	@Override
+	public ClientAddressProjection getClientById(Long userId) {
+		return serviceRequestRepository.fetchClientWithId(userId);
+	}
+
+	@Override
+	public List<ServiceRequestProjection> findAllServicesForClientId(Long id) {
+		return serviceRequestRepository.findAllServicesForClientId(id);
 	}
 
 }

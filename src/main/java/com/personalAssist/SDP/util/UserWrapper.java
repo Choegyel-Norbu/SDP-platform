@@ -20,6 +20,6 @@ public class UserWrapper {
 	public static ServiceRequestDTO toServiceDTO(ServiceRequest service) {
 		return new ServiceRequestDTO(service.getId(), service.getServiceName(), service.getDescription(),
 				service.getRate(), service.getRequestedDate(), service.getCreatedAt(), service.getPriority(),
-				service.getRepeatFrequency());
+				service.getRepeatFrequency(), service.getServiceType());
 	}
 }

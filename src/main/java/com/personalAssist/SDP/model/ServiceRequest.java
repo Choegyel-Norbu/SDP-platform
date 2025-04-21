@@ -38,6 +38,7 @@ public class ServiceRequest {
 	private String description;
 	private int rate;
 	private LocalDateTime requestedDate;
+	private String serviceType;
 
 	@Enumerated(EnumType.STRING)
 	private RepeatFrequency repeatFrequency;
@@ -65,6 +66,14 @@ public class ServiceRequest {
 
 	public ServiceRequest() {
 		super();
+	}
+
+	public String getServiceType() {
+		return serviceType;
+	}
+
+	public void setServiceType(String serviceType) {
+		this.serviceType = serviceType;
 	}
 
 	public Long getId() {

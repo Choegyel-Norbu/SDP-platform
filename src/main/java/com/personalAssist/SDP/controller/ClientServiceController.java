@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.personalAssist.SDP.dto.ClientDTO;
 import com.personalAssist.SDP.dto.ServiceRequestDTO;
+import com.personalAssist.SDP.interfaces.ClientAddressProjection;
+import com.personalAssist.SDP.interfaces.ServiceRequestProjection;
 import com.personalAssist.SDP.model.ServiceRequest;
 import com.personalAssist.SDP.service.ClientService;
 
@@ -36,6 +38,16 @@ public class ClientServiceController {
 		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("Failed");
 	}
+	
+	@GetMapping("getClientWithId/{id}")
+	public ResponseEntity<ClientAddressProjection> fetchClientWithId(@PathVariable Long id) {
+		ClientAddressProjection client = clientService.getClientById(id);
+		if (client != null) {
+			return ResponseEntity.ok().body(client);
+		}
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		
+	}
 
 	@PostMapping("/serviceRequest")
 	public ResponseEntity<?> initiateServiceRequest(@RequestBody ServiceRequestDTO dto) {
@@ -47,15 +59,25 @@ public class ClientServiceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("Failed");
 	}
 
+	@GetMapping("/getServicesForClient/{id}")
+	public ResponseEntity<?> findAllServicesForClientId(@PathVariable Long id){
+		List<ServiceRequestProjection> clientServices = clientService.findAllServicesForClientId(id);
+		
+		if(clientServices != null) {
+			return ResponseEntity.ok().body(clientServices);
+		}
+		return ResponseEntity.status(HttpStatus.CONFLICT).body("Failed");
+	}
+	
 	@PatchMapping("/updateService")
-	public ResponseEntity<?> updateServiceRequest(@RequestBody ServiceRequestDTO dto){
+	public ResponseEntity<?> updateServiceRequest(@RequestBody ServiceRequestDTO dto) {
 		ServiceRequest service = clientService.updateServiceRequest(dto);
 		if (service != null) {
 			return ResponseEntity.ok().body(service);
 		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
-	
+
 	@PutMapping("/updateStatus/{id}")
 	public ResponseEntity<?> updateServiceStatus(@PathVariable Long id, @RequestParam("status") String status) {
 		boolean response = clientService.updateServiceStatus(id, status);
@@ -65,9 +87,19 @@ public class ClientServiceController {
 		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("Failed");
 	}
+
+	@GetMapping("/getServices")
+	public List<ServiceRequestDTO> getServices() {
+		return clientService.getAllServices();
+	}
 	
 	@GetMapping("/getAllServices")
-	public List<ServiceRequestDTO> getAllServices(){
-		return clientService.getAllServices();
+	public List<ServiceRequestProjection> getAllServices() {
+		return clientService.getServices();
+	}
+	
+	@GetMapping("/countServiceRequest")
+	public long countServiceRequest() {
+		return clientService.countServiceRequest();
 	}
 }

@@ -8,9 +8,13 @@ import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.personalAssist.SDP.enums.UserRole;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -37,9 +41,9 @@ public class User {
 
 	@Column(nullable = false)
 	private String password;
-	
+
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Client client;
+	private Client client;
 
 	@CreationTimestamp
 	private LocalDateTime createdAt;;
@@ -47,12 +51,31 @@ public class User {
 	@CreationTimestamp
 	private LocalDateTime updatedAt;
 
+	@Enumerated(EnumType.STRING)
+	private UserRole role;
+
 	public Long getId() {
 		return id;
 	}
 
 	public String getEmail() {
 		return email;
+	}
+
+	public Client getClient() {
+		return client;
+	}
+
+	public void setClient(Client client) {
+		this.client = client;
+	}
+
+	public UserRole getRole() {
+		return role;
+	}
+
+	public void setRole(UserRole role) {
+		this.role = role;
 	}
 
 	public void setEmail(String email) {

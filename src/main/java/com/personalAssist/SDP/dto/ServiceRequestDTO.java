@@ -18,13 +18,14 @@ public class ServiceRequestDTO {
 	private LocalDateTime updatedAt;
 	private String priority;
 	private String repeatFrequency;
+	private String serviceType;
 	
 //	for customize response
 	private Priority responsePriority;
 	private RepeatFrequency responseFrequency;
 
 	public ServiceRequestDTO(Long serviceRequestId, String serviceName, String description, int rate,
-			LocalDateTime requestedDate, LocalDateTime createdAt, Priority responsePriority, RepeatFrequency responseFrequency) {
+			LocalDateTime requestedDate, LocalDateTime createdAt, Priority responsePriority, RepeatFrequency responseFrequency, String serviceType) {
 		super();
 		this.serviceRequestId = serviceRequestId;
 		this.serviceName = serviceName;
@@ -34,6 +35,7 @@ public class ServiceRequestDTO {
 		this.createdAt = createdAt;
 		this.responsePriority = responsePriority;
 		this.responseFrequency = responseFrequency;
+		this.serviceType = serviceType;
 	}
 
 	public Long getUserId() {
@@ -42,6 +44,15 @@ public class ServiceRequestDTO {
 
 	public void setUserId(Long userId) {
 		this.userId = userId;
+	}
+	
+
+	public String getServiceType() {
+		return serviceType;
+	}
+
+	public void setServiceType(String serviceType) {
+		this.serviceType = serviceType;
 	}
 
 	public String getServiceName() {
