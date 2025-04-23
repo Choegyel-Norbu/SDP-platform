@@ -49,6 +49,7 @@ public class AuthController {
 		UserResponseDTO dto = new UserResponseDTO();
 		dto.setId(user.getId());
 		dto.setEmail(user.getEmail());
+		dto.setRole(user.getRole());
 		return ResponseEntity.ok(new LoginApiResponse(token, dto));
 	}
 

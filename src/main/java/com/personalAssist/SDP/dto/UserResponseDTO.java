@@ -1,9 +1,12 @@
 package com.personalAssist.SDP.dto;
 
+import com.personalAssist.SDP.enums.UserRole;
+
 public class UserResponseDTO {
 
 	private Long id;
 	private String email;
+	private UserRole role;
 
 	public Long getId() {
 		return id;
@@ -20,5 +23,14 @@ public class UserResponseDTO {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
+	public UserRole getRole() {
+		return role;
+	}
+
+	public void setRole(UserRole role) {
+		this.role = role;
+	}
+
 
 }
