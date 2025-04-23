@@ -1,6 +1,6 @@
 package com.personalAssist.SDP.interfaces;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public interface ServiceRequestProjection {
 	Long getId();
@@ -8,6 +8,6 @@ public interface ServiceRequestProjection {
     String getPriority();
     String getServiceType();
     String getRepeatFrequency();
-    LocalDate getRequestedDate();
+    LocalDateTime getRequestedDate();
     String getStatus();
 }

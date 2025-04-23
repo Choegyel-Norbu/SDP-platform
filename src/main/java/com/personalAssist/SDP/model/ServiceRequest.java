@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.personalAssist.SDP.enums.Priority;
 import com.personalAssist.SDP.enums.RepeatFrequency;
 import com.personalAssist.SDP.enums.Status;
@@ -37,7 +38,10 @@ public class ServiceRequest {
 	private String serviceName;
 	private String description;
 	private int rate;
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime requestedDate;
+	
 	private String serviceType;
 
 	@Enumerated(EnumType.STRING)

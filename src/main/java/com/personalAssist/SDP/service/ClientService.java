@@ -19,7 +19,7 @@ public interface ClientService {
 	public List<ServiceRequestDTO> getAllServices(); 
 	public List<ServiceRequestProjection> getServices(); 
 	public List<ServiceRequestProjection> findAllServicesForClientId(Long id); 
-
+	public boolean clientSet(Long userId);
 	
 	public long countServiceRequest();
 

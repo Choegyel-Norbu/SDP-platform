@@ -14,4 +14,7 @@ public interface ClientRepository extends JpaRepository<Client, Long>{
 
 	@Query(value = "SELECT * FROM client WHERE user_id = :userId", nativeQuery = true)
 	Client loadClientByUserId(@Param("userId") Long userId);
+	
+	@Query(value = "select * from client c where user_id = :userId", nativeQuery = true)
+	Client clientSet(@Param("userId") Long userId);
 }

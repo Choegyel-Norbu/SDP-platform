@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +21,7 @@ import com.personalAssist.SDP.dto.ServiceRequestDTO;
 import com.personalAssist.SDP.interfaces.ClientAddressProjection;
 import com.personalAssist.SDP.interfaces.ServiceRequestProjection;
 import com.personalAssist.SDP.model.ServiceRequest;
+import com.personalAssist.SDP.repository.ServiceRequestRepository;
 import com.personalAssist.SDP.service.ClientService;
 
 @RestController
@@ -28,6 +30,9 @@ public class ClientServiceController {
 
 	@Autowired
 	ClientService clientService;
+	
+	@Autowired
+	ServiceRequestRepository serviceRepository;
 
 	@PostMapping("/addClient")
 	public ResponseEntity<?> addClient(@RequestBody ClientDTO clientDTO) {
@@ -47,6 +52,15 @@ public class ClientServiceController {
 		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 		
+	}
+	
+	@GetMapping("clientSet/{userId}")
+	public ResponseEntity<?> clientSet(@PathVariable Long userId){
+		boolean clientSet = clientService.clientSet(userId);
+		if(clientSet) {
+			return ResponseEntity.ok().body(clientSet);
+		}
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(clientSet);
 	}
 
 	@PostMapping("/serviceRequest")
@@ -101,5 +115,16 @@ public class ClientServiceController {
 	@GetMapping("/countServiceRequest")
 	public long countServiceRequest() {
 		return clientService.countServiceRequest();
+	}
+	
+	@DeleteMapping("/deleteServiceRequest/{id}")
+	public ResponseEntity<String> deleteServiceRequest(@PathVariable Long id) {
+	    if (!serviceRepository.existsById(id)) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                             .body("Service request with ID " + id + " not found.");
+	    }
+
+	    serviceRepository.deleteById(id);
+	    return ResponseEntity.ok("Service request with ID " + id + " has been successfully deleted.");
 	}
 }

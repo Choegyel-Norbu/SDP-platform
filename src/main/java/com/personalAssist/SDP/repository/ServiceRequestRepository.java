@@ -36,11 +36,11 @@ public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, 
 			+ "from client c join address a \n" + "on c.address_id = a.id \n" + "join users u \n"
 			+ "on u.id = c.user_id \n" + "where u.id = :id", nativeQuery = true)
 	ClientAddressProjection fetchClientWithId(@Param("id") Long id);
-
-	@Query(value = "SELECT sr.id, sr.priority, sr.repeat_frequency, sr.requested_date, "
-			+ "sr.service_name, sr.service_type, ss.status " + "FROM service_request sr "
-			+ "INNER JOIN client c ON sr.client_id = c.id " + "JOIN users u ON c.user_id = u.id "
-			+ "JOIN service_status ss ON ss.status = sr.status " + "WHERE u.id = :id", nativeQuery = true)
+	
+	@Query(value = "select sr.id, sr.priority, sr.repeat_frequency, sr.requested_date, sr.service_name, sr.service_type, ss.status from service_request sr join service_status ss on sr.status = ss.id \n"
+			+ "join client c on c.id = sr.client_id \n"
+			+ "join users u on u.id = c.user_id \n"
+			+ "where u.id = :id", nativeQuery = true)
 	List<ServiceRequestProjection> findAllServicesForClientId(@Param("id") Long id);
 
 }

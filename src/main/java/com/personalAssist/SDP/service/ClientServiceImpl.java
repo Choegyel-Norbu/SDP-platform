@@ -177,5 +177,10 @@ public class ClientServiceImpl implements ClientService {
 	public List<ServiceRequestProjection> findAllServicesForClientId(Long id) {
 		return serviceRequestRepository.findAllServicesForClientId(id);
 	}
+	
+	@Override
+	public boolean clientSet(Long userId) {
+		return clientRepository.clientSet(userId) != null;
+	}
 
 }
