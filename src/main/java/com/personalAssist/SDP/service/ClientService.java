@@ -15,7 +15,7 @@ public interface ClientService {
 	
 	public boolean initiateServiceRequest(ServiceRequestDTO dto);
 	public ClientAddressProjection getClientById(Long userId);
-	public ServiceRequest updateServiceRequest(ServiceRequestDTO dto);
+	public ServiceRequestDTO updateServiceRequest(ServiceRequestDTO dto);
 	public List<ServiceRequestDTO> getAllServices(); 
 	public List<ServiceRequestProjection> getServices(); 
 	public List<ServiceRequestProjection> findAllServicesForClientId(Long id); 

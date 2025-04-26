@@ -133,16 +133,19 @@ public class ClientServiceImpl implements ClientService {
 	}
 
 	@Override
-	public ServiceRequest updateServiceRequest(ServiceRequestDTO dto) {
+	public ServiceRequestDTO updateServiceRequest(ServiceRequestDTO dto) {
 		ServiceRequest service = serviceRequestRepository.findById(dto.getServiceRequestId()).orElse(null);
 		service.setDescription(dto.getDescription());
 		service.setRequestedDate(dto.getRequestedDate());
 		service.setServiceName(dto.getServiceName());
 		service.setRate(dto.getRate());
+		service.setServiceType(dto.getServiceType());
 		withPriority(service, dto.getPriority());
 		serviceFrequency(service, dto.getRepeatFrequency());
 
-		return serviceRequestRepository.save(service);
+		ServiceRequest request = serviceRequestRepository.save(service);
+		
+		return UserWrapper.toServiceResponseDTO(service);
 	}
 
 	@Override

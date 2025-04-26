@@ -83,9 +83,9 @@ public class ClientServiceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("Failed");
 	}
 	
-	@PatchMapping("/updateService")
+	@PutMapping("/updateService")
 	public ResponseEntity<?> updateServiceRequest(@RequestBody ServiceRequestDTO dto) {
-		ServiceRequest service = clientService.updateServiceRequest(dto);
+		ServiceRequestDTO service = clientService.updateServiceRequest(dto);
 		if (service != null) {
 			return ResponseEntity.ok().body(service);
 		}

@@ -1,6 +1,7 @@
 package com.personalAssist.SDP.dto;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import com.personalAssist.SDP.enums.Priority;
 import com.personalAssist.SDP.enums.RepeatFrequency;
@@ -13,19 +14,24 @@ public class ServiceRequestDTO {
 	private String serviceName;
 	private String description;
 	private int rate;
-	private LocalDateTime requestedDate;
-	private LocalDateTime createdAt;
-	private LocalDateTime updatedAt;
+	private OffsetDateTime requestedDate;
+	private OffsetDateTime createdAt;
+	private OffsetDateTime updatedAt;
 	private String priority;
 	private String repeatFrequency;
 	private String serviceType;
-	
+
 //	for customize response
 	private Priority responsePriority;
 	private RepeatFrequency responseFrequency;
 
+	public ServiceRequestDTO() {
+		super();
+	}
+
 	public ServiceRequestDTO(Long serviceRequestId, String serviceName, String description, int rate,
-			LocalDateTime requestedDate, LocalDateTime createdAt, Priority responsePriority, RepeatFrequency responseFrequency, String serviceType) {
+			OffsetDateTime requestedDate, OffsetDateTime createdAt, Priority responsePriority,
+			RepeatFrequency responseFrequency, String serviceType) {
 		super();
 		this.serviceRequestId = serviceRequestId;
 		this.serviceName = serviceName;
@@ -38,6 +44,36 @@ public class ServiceRequestDTO {
 		this.serviceType = serviceType;
 	}
 
+	public Priority getResponsePriority() {
+		return responsePriority;
+	}
+
+	public void setResponsePriority(Priority responsePriority) {
+		this.responsePriority = responsePriority;
+	}
+
+	public RepeatFrequency getResponseFrequency() {
+		return responseFrequency;
+	}
+
+	public void setResponseFrequency(RepeatFrequency responseFrequency) {
+		this.responseFrequency = responseFrequency;
+	}
+
+	public ServiceRequestDTO(Long serviceRequestId, String serviceName, String description,
+			OffsetDateTime requestedDate, Priority responsePriority, RepeatFrequency responseFrequency,
+			String serviceType) {
+		super();
+		this.serviceRequestId = serviceRequestId;
+		this.serviceName = serviceName;
+		this.description = description;
+		this.requestedDate = requestedDate;
+		this.serviceType = serviceType;
+		this.responsePriority = responsePriority;
+		this.responseFrequency = responseFrequency;
+		this.serviceType = serviceType;
+	}
+
 	public Long getUserId() {
 		return userId;
 	}
@@ -45,7 +81,6 @@ public class ServiceRequestDTO {
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
-	
 
 	public String getServiceType() {
 		return serviceType;
@@ -79,6 +114,30 @@ public class ServiceRequestDTO {
 		this.description = description;
 	}
 
+	public OffsetDateTime getRequestedDate() {
+		return requestedDate;
+	}
+
+	public void setRequestedDate(OffsetDateTime requestedDate) {
+		this.requestedDate = requestedDate;
+	}
+
+	public OffsetDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(OffsetDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public OffsetDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(OffsetDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
 	public int getRate() {
 		return rate;
 	}
@@ -87,36 +146,12 @@ public class ServiceRequestDTO {
 		this.rate = rate;
 	}
 
-	public LocalDateTime getRequestedDate() {
-		return requestedDate;
-	}
-
 	public String getRepeatFrequency() {
 		return repeatFrequency;
 	}
 
 	public void setRepeatFrequency(String repeatFrequency) {
 		this.repeatFrequency = repeatFrequency;
-	}
-
-	public void setRequestedDate(LocalDateTime requestedDate) {
-		this.requestedDate = requestedDate;
-	}
-
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public LocalDateTime getUpdatedAt() {
-		return updatedAt;
-	}
-
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
 	}
 
 	public String getPriority() {

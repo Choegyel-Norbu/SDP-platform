@@ -1,6 +1,7 @@
 package com.personalAssist.SDP.model;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -12,6 +13,7 @@ import com.personalAssist.SDP.enums.Status;
 import com.personalAssist.SDP.enums.ServiceType;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -38,20 +40,23 @@ public class ServiceRequest {
 	private String serviceName;
 	private String description;
 	private int rate;
-	
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private LocalDateTime requestedDate;
-	
+
+
+	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") // OR use default ISO
+	private OffsetDateTime requestedDate;
+
 	private String serviceType;
 
 	@Enumerated(EnumType.STRING)
 	private RepeatFrequency repeatFrequency;
 
 	@CreationTimestamp
-	private LocalDateTime createdAt;
+	@Column(columnDefinition = "TIMESTAMP")
+	private OffsetDateTime createdAt;
 
 	@CreationTimestamp
-	private LocalDateTime updatedAt;
+	@Column(columnDefinition = "TIMESTAMP")
+	private OffsetDateTime updatedAt;
 
 	public ServiceStatus getStatus() {
 		return status;
@@ -104,14 +109,6 @@ public class ServiceRequest {
 		this.client = client;
 	}
 
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
-	}
-
 	public String getServiceName() {
 		return serviceName;
 	}
@@ -136,20 +133,28 @@ public class ServiceRequest {
 		this.rate = rate;
 	}
 
-	public LocalDateTime getRequestedDate() {
+	public OffsetDateTime getRequestedDate() {
 		return requestedDate;
 	}
 
-	public void setRequestedDate(LocalDateTime requestedDate) {
+	public void setRequestedDate(OffsetDateTime requestedDate) {
 		this.requestedDate = requestedDate;
 	}
 
-	public LocalDateTime getCreatedAt() {
+	public OffsetDateTime getCreatedAt() {
 		return createdAt;
 	}
 
-	public LocalDateTime getUpdatedAt() {
+	public void setCreatedAt(OffsetDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public OffsetDateTime getUpdatedAt() {
 		return updatedAt;
+	}
+
+	public void setUpdatedAt(OffsetDateTime updatedAt) {
+		this.updatedAt = updatedAt;
 	}
 
 	public Priority getPriority() {

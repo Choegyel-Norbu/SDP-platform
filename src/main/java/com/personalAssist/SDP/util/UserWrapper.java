@@ -22,4 +22,13 @@ public class UserWrapper {
 				service.getRate(), service.getRequestedDate(), service.getCreatedAt(), service.getPriority(),
 				service.getRepeatFrequency(), service.getServiceType());
 	}
+
+	public static ServiceRequestDTO toServiceResponseDTO(ServiceRequest service) {
+		return new ServiceRequestDTO(service.getId(), service.getServiceName(), service.getDescription(),
+				service.getRequestedDate(), service.getPriority(), service.getRepeatFrequency(),
+				service.getServiceType()
+
+		);
+
+	}
 }
