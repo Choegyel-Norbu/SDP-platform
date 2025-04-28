@@ -127,7 +127,6 @@ public class ClientServiceImpl implements ClientService {
 		address.setStreetType(dto.getStreetType());
 		address.setSubarb(dto.getSubarb());
 		address.setUnit(dto.getUnit());
-//		address.setUnitNumber(dto.getUnitNumber());
 
 		return addressRepository.save(address);
 	}
@@ -184,6 +183,27 @@ public class ClientServiceImpl implements ClientService {
 	@Override
 	public boolean clientSet(Long userId) {
 		return clientRepository.clientSet(userId) != null;
+	}
+
+	@Override
+	public boolean updateClient(ClientDTO clientDTO) {
+		Client client = clientRepository.loadClientByUserId(clientDTO.getUserId()); 
+		Address address = updateAddress(client.getAddress(), clientDTO.getAddressDTO());
+		client.setFirstName(clientDTO.getFirstName());
+		client.setLastName(clientDTO.getLastName());
+		client.setPhoneNumber(clientDTO.getPhoneNumber());
+		client.setAddress(address);
+		return clientRepository.save(client) != null;
+	}
+	
+	private Address updateAddress(Address clientAddress, AddressDTO DtoAddress) {
+		clientAddress.setState(DtoAddress.getState());
+		clientAddress.setStreetAddress(DtoAddress.getStreetAddress());
+		clientAddress.setStreetType(DtoAddress.getStreetType());
+		clientAddress.setSubarb(DtoAddress.getSubarb());
+		clientAddress.setUnit(DtoAddress.getUnit());
+		
+		return clientAddress;
 	}
 
 }

@@ -53,28 +53,10 @@ public class AuthController {
 		return ResponseEntity.ok(new LoginApiResponse(token, dto));
 	}
 
-//	@PostMapping("/login")
-//	public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDTO) {
-//		User user = userRepository.findByEmail(loginRequestDTO.getEmail());
-//
-//		if (user == null) {
-//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!");
-//		}
-//
-//		if (!PasswordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
-//			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credetials");
-//		}
-//
-//		emailService.generateOtpAndSendOtp(user.getEmail());
-//
-//		return ResponseEntity.status(HttpStatus.ACCEPTED).body("Password verified. OTP sent to email.");
-//
-//	}
-
 	@PostMapping("/sendOtp")
 	public ResponseEntity<String> sendOtp(@RequestParam String email) {
 		emailService.generateOtpAndSendOtp(email);
-		return ResponseEntity.ok("OTP sent to email.");
+		return ResponseEntity.status(HttpStatus.CREATED).body("OTP sent to email: "+ email);
 	}
 
 	@PostMapping("/verifyOtp")
@@ -84,13 +66,7 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired OTP.");
 
 		}
-		User user = userRepository.findByEmail(email);
-
-		String token = JwtUtil.generateToken(user.getEmail());
-		UserResponseDTO dto = new UserResponseDTO();
-		dto.setId(user.getId());
-		dto.setEmail(user.getEmail());
-		return ResponseEntity.ok(new LoginApiResponse(token, dto));
+		return ResponseEntity.ok(true);
 	}
 
 }

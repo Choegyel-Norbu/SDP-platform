@@ -44,6 +44,16 @@ public class ClientServiceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("Failed");
 	}
 	
+	@PutMapping("/updateClient")
+	public ResponseEntity<?> updateClient(@RequestBody ClientDTO clientDTO) {
+		Boolean client = clientService.updateClient(clientDTO);
+
+		if (client) {
+			return ResponseEntity.ok().body("Success");
+		}
+		return ResponseEntity.status(HttpStatus.CONFLICT).body("Error updating client");
+	}
+	
 	@GetMapping("getClientWithId/{id}")
 	public ResponseEntity<ClientAddressProjection> fetchClientWithId(@PathVariable Long id) {
 		ClientAddressProjection client = clientService.getClientById(id);
@@ -55,7 +65,7 @@ public class ClientServiceController {
 	}
 	
 	@GetMapping("clientSet/{userId}")
-	public ResponseEntity<?> clientSet(@PathVariable Long userId){
+	public ResponseEntity<?> isClientSet(@PathVariable Long userId){
 		boolean clientSet = clientService.clientSet(userId);
 		if(clientSet) {
 			return ResponseEntity.ok().body(clientSet);

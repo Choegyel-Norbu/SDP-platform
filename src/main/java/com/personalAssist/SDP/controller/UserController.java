@@ -23,7 +23,10 @@ import com.personalAssist.SDP.dto.UserDTO;
 import com.personalAssist.SDP.dto.UserResponseDTO;
 import com.personalAssist.SDP.model.User;
 import com.personalAssist.SDP.repository.UserRepository;
+import com.personalAssist.SDP.service.EmailService;
 import com.personalAssist.SDP.service.UserService;
+import com.personalAssist.SDP.util.JwtUtil;
+import com.personalAssist.SDP.wrapper.LoginApiResponse;
 
 @RestController
 @RequestMapping("/api")
@@ -31,12 +34,22 @@ public class UserController {
 
 	@Autowired
 	UserService userService;
-	
+
 	@Autowired
 	UserRepository userRepo;
 
-	@PostMapping("/registration")
-	public ResponseEntity<UserResponseDTO> register(@RequestBody UserDTO userDTO) {
+	@Autowired
+	EmailService emailService;
+
+	@Autowired
+	UserRepository userRepository;
+
+	@PostMapping("/register")
+	public ResponseEntity<?> register(@RequestBody UserDTO userDTO) {
+
+		if (checkUserEmail(userDTO.getEmail())) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already registered");
+		}
 
 		UserDTO result = userService.register(userDTO);
 		UserResponseDTO dto = new UserResponseDTO();
@@ -48,6 +61,28 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 
+	}
+
+	@PostMapping("/sendOtp")
+	public ResponseEntity<String> sendOtp(@RequestParam String email) {
+		emailService.generateOtpAndSendOtp(email);
+		return ResponseEntity.status(HttpStatus.CREATED).body("OTP sent to email: " + email);
+	}
+
+	@PostMapping("/verifyOtp")
+	public ResponseEntity<?> verifyOtp(@RequestParam String email, @RequestParam String otp) {
+		boolean isValid = emailService.validateOtp(email, otp);
+		if (!isValid) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired OTP.");
+
+		}
+		User user = userRepository.findByEmail(email);
+
+		String token = JwtUtil.generateToken(user.getEmail());
+		UserResponseDTO dto = new UserResponseDTO();
+		dto.setId(user.getId());
+		dto.setEmail(user.getEmail());
+		return ResponseEntity.ok(new LoginApiResponse(token, dto));
 	}
 
 	@GetMapping("/getUsers")
@@ -69,6 +104,9 @@ public class UserController {
 	public Optional<User> updateUser(@PathVariable Long id, @RequestBody User product) {
 		return userService.updateUser(id, product);
 	}
-	
+
+	private boolean checkUserEmail(String email) {
+		return userRepository.findByEmail(email) != null;
+	}
 
 }
