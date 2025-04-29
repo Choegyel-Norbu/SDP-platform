@@ -42,5 +42,38 @@ public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, 
 			+ "join users u on u.id = c.user_id \n"
 			+ "where u.id = :id", nativeQuery = true)
 	List<ServiceRequestProjection> findAllServicesForClientId(@Param("id") Long id);
-
+	
+	@Query(value = "SELECT sr.id, sr.service_name, sr.priority, sr.service_type, sr.repeat_frequency, sr.requested_date, ss.status \n"
+			+ "FROM service_request sr join service_status ss on ss.id = sr.status \n"
+			+ "ORDER BY \n"
+			+ "  CASE priority\n"
+			+ "    WHEN 'HIGH' THEN 1\n"
+			+ "    WHEN 'NORMAL' THEN 2\n"
+			+ "    WHEN 'LOW' THEN 3\n"
+			+ "    ELSE 4\n"
+			+ "  END ASC", nativeQuery = true)
+	List<ServiceRequestProjection> priorityHighToLow();
+	
+	@Query(value = "SELECT sr.id, sr.service_name, sr.priority, sr.service_type, sr.repeat_frequency, sr.requested_date, ss.status \n"
+			+ "FROM service_request sr join service_status ss on ss.id = sr.status \n"
+			+ "ORDER BY \n"
+			+ "  CASE ss.status\n"
+			+ "    WHEN 'PENDING' THEN 1\n"
+			+ "    WHEN 'ASSIGNED' THEN 2\n"
+			+ "    WHEN 'COMPLETED' THEN 3\n"
+			+ "    ELSE 4\n"
+			+ "  END ASC", nativeQuery = true)
+	List<ServiceRequestProjection> status();
+	
+	@Query(value = "SELECT sr.id, sr.service_name, sr.priority, sr.service_type, sr.repeat_frequency, sr.requested_date, ss.status \n"
+			+ "FROM service_request sr join service_status ss on ss.id = sr.status \n"
+			+ "ORDER BY requested_date DESC", nativeQuery = true)
+	List<ServiceRequestProjection> closestDate();
+	
+	@Query(value = "SELECT sr.id, sr.service_name, sr.priority, sr.service_type, sr.repeat_frequency, sr.requested_date, ss.status \n"
+			+ "FROM service_request sr join service_status ss on ss.id = sr.status \n"
+			+ "ORDER BY requested_date ASC", nativeQuery = true)
+	List<ServiceRequestProjection> oldestDate();
+	
+	
 }

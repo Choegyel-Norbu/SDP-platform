@@ -206,4 +206,34 @@ public class ClientServiceImpl implements ClientService {
 		return clientAddress;
 	}
 
+	@Override
+	public List<ServiceRequestProjection> sortServices(String option) {
+		switch (option){
+		case "date-asc":
+			return serviceRequestRepository.oldestDate();
+		case "date-desc":
+			return serviceRequestRepository.closestDate();
+		case "priority-high":
+			return serviceRequestRepository.priorityHighToLow();
+		case "status":
+			return serviceRequestRepository.status();
+		}
+		return null;
+	}
+
+	@Override
+	public ClientAddressProjection getClientAddressFromServiceId(Long serviceId) {
+		return clientRepository.getClientAddressFromServiceId(serviceId);
+	}
 }
+
+
+
+
+
+
+
+
+
+
+

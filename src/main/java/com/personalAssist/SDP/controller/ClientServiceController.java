@@ -137,4 +137,14 @@ public class ClientServiceController {
 	    serviceRepository.deleteById(id);
 	    return ResponseEntity.ok("Service request with ID " + id + " has been successfully deleted.");
 	}
+	
+	@GetMapping("/sortServices")
+	public List<ServiceRequestProjection> sortServices(@RequestParam String option){
+		return clientService.sortServices(option);
+	}
+	
+	@GetMapping("/client-address/service/{serviceId}")
+	public ClientAddressProjection getClientAddressFromServiceId(@PathVariable Long serviceId) {
+		return clientService.getClientAddressFromServiceId(serviceId);
+	}
 }

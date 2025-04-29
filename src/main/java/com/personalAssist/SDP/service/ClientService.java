@@ -22,6 +22,9 @@ public interface ClientService {
 	public boolean clientSet(Long userId);
 	public boolean updateClient(ClientDTO clientDTO);
 	
+	public List<ServiceRequestProjection> sortServices(String option);
+	public ClientAddressProjection getClientAddressFromServiceId(Long serviceId);
+	
 	public long countServiceRequest();
 
 	
