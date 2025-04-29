@@ -2,6 +2,7 @@ package com.personalAssist.SDP.model;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -25,6 +26,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 
 @Entity
 public class ServiceRequest {
@@ -42,9 +45,9 @@ public class ServiceRequest {
 	private int rate;
 
 
-	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") // OR use default ISO
+	@Column(columnDefinition = "TIMESTAMP")
 	private OffsetDateTime requestedDate;
-
+	
 	private String serviceType;
 
 	@Enumerated(EnumType.STRING)
