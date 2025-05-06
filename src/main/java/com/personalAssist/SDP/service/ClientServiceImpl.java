@@ -6,21 +6,31 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.personalAssist.SDP.dto.AddOnDTO;
 import com.personalAssist.SDP.dto.AddressDTO;
+import com.personalAssist.SDP.dto.BookingDTO;
 import com.personalAssist.SDP.dto.ClientDTO;
+import com.personalAssist.SDP.dto.ReviewDTO;
 import com.personalAssist.SDP.dto.ServiceRequestDTO;
 import com.personalAssist.SDP.enums.Priority;
 import com.personalAssist.SDP.enums.RepeatFrequency;
 import com.personalAssist.SDP.enums.Status;
 import com.personalAssist.SDP.interfaces.ClientAddressProjection;
+import com.personalAssist.SDP.interfaces.ReviewProjection;
 import com.personalAssist.SDP.interfaces.ServiceRequestProjection;
+import com.personalAssist.SDP.model.AddOn;
 import com.personalAssist.SDP.model.Address;
+import com.personalAssist.SDP.model.Booking;
 import com.personalAssist.SDP.model.Client;
+import com.personalAssist.SDP.model.Review;
 import com.personalAssist.SDP.model.ServiceRequest;
 import com.personalAssist.SDP.model.ServiceStatus;
 import com.personalAssist.SDP.model.User;
+import com.personalAssist.SDP.repository.AddOnRepository;
 import com.personalAssist.SDP.repository.AddressRepository;
+import com.personalAssist.SDP.repository.BookingRepository;
 import com.personalAssist.SDP.repository.ClientRepository;
+import com.personalAssist.SDP.repository.ReviewRepository;
 import com.personalAssist.SDP.repository.ServiceRequestRepository;
 import com.personalAssist.SDP.repository.ServiceStatusRepository;
 import com.personalAssist.SDP.repository.UserRepository;
@@ -43,6 +53,15 @@ public class ClientServiceImpl implements ClientService {
 
 	@Autowired
 	ServiceStatusRepository serviceStatusRepository;
+	
+	@Autowired
+	ReviewRepository reviewRepository;
+	
+	@Autowired
+	BookingRepository bookingRepository;
+	
+	@Autowired
+	AddOnRepository addOnRepository;
 
 	@Override
 	public boolean associateClient(ClientDTO clientDTO) {
@@ -113,7 +132,17 @@ public class ClientServiceImpl implements ClientService {
 
 		ServiceRequest service = serviceRequestRepository.findById(serviceId).orElse(null);
 		service.setStatus(serviceStatus);
-		return serviceRequestRepository.save(service) != null;
+		ServiceRequest serviceRequest = serviceRequestRepository.save(service);
+
+		if (serviceRequest != null) {
+			if (status.equalsIgnoreCase("completed")) {
+				Client client = serviceRequestRepository.findClientByServiceRequestId(serviceId);
+				client.setCanReview(true);
+				clientRepository.save(client);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private ServiceStatus associateStatus(ServiceRequest service) {
@@ -143,7 +172,7 @@ public class ClientServiceImpl implements ClientService {
 		serviceFrequency(service, dto.getRepeatFrequency());
 
 		ServiceRequest request = serviceRequestRepository.save(service);
-		
+
 		return UserWrapper.toServiceResponseDTO(service);
 	}
 
@@ -179,7 +208,7 @@ public class ClientServiceImpl implements ClientService {
 	public List<ServiceRequestProjection> findAllServicesForClientId(Long id) {
 		return serviceRequestRepository.findAllServicesForClientId(id);
 	}
-	
+
 	@Override
 	public boolean clientSet(Long userId) {
 		return clientRepository.clientSet(userId) != null;
@@ -187,7 +216,7 @@ public class ClientServiceImpl implements ClientService {
 
 	@Override
 	public boolean updateClient(ClientDTO clientDTO) {
-		Client client = clientRepository.loadClientByUserId(clientDTO.getUserId()); 
+		Client client = clientRepository.loadClientByUserId(clientDTO.getUserId());
 		Address address = updateAddress(client.getAddress(), clientDTO.getAddressDTO());
 		client.setFirstName(clientDTO.getFirstName());
 		client.setLastName(clientDTO.getLastName());
@@ -195,20 +224,20 @@ public class ClientServiceImpl implements ClientService {
 		client.setAddress(address);
 		return clientRepository.save(client) != null;
 	}
-	
+
 	private Address updateAddress(Address clientAddress, AddressDTO DtoAddress) {
 		clientAddress.setState(DtoAddress.getState());
 		clientAddress.setStreetAddress(DtoAddress.getStreetAddress());
 		clientAddress.setStreetType(DtoAddress.getStreetType());
 		clientAddress.setSubarb(DtoAddress.getSubarb());
 		clientAddress.setUnit(DtoAddress.getUnit());
-		
+
 		return clientAddress;
 	}
 
 	@Override
 	public List<ServiceRequestProjection> sortServices(String option) {
-		switch (option){
+		switch (option) {
 		case "date-asc":
 			return serviceRequestRepository.oldestDate();
 		case "date-desc":
@@ -225,15 +254,82 @@ public class ClientServiceImpl implements ClientService {
 	public ClientAddressProjection getClientAddressFromServiceId(Long serviceId) {
 		return clientRepository.getClientAddressFromServiceId(serviceId);
 	}
+
+	@Override
+	public Review clientReview(ReviewDTO reviewDTO, Long clientId) {
+		Client client = clientRepository.findById(clientId).orElse(null);
+		
+		Review review = new Review();
+		review.setClient(client);
+		review.setComment(reviewDTO.getComment());
+		review.setRating(reviewDTO.getRating());
+		
+		return reviewRepository.save(review);
+	}
+
+	@Override
+	public List<ReviewProjection> getReview() {
+		return reviewRepository.getReview();
+	}
+
+	@Override
+	public void deleteReview(Long reviewId) {
+		reviewRepository.deleteById(reviewId);
+	}
+
+	@Override
+	public Review updateReview(ReviewDTO reviewDTO) {
+		Review review = reviewRepository.findById(reviewDTO.getId()).orElse(null);
+		review.setComment(reviewDTO.getComment());
+		review.setRating(reviewDTO.getRating());
+			
+		return reviewRepository.save(review);
+	}
+
+	@Override
+	public boolean scheduleBooking(BookingDTO bookingDTO) {
+		Client client = clientRepository.loadClientByUserId(bookingDTO.getUserId());
+		Booking booking = new Booking();
+		
+		booking.setClient(client);
+		ServiceRequest service = serviceRequestRepository.save(UserWrapper.toServiceRequest(bookingDTO.getServiceRequest()));
+		booking.setServiceRequest(service);
+		bookingFrequency(booking, bookingDTO.getFrequency());
+		booking.setStatus(Status.PENDING);
+		booking.setSpecialInstructions(bookingDTO.getSpecialInstructions());
+		booking.setStartTime(bookingDTO.getStartTime());
+		booking.setEndTime(bookingDTO.getEndTime());
+		booking.setNumberOfBedrooms(bookingDTO.getNumberOfBedrooms());
+		booking.setNumberOfBathrooms(bookingDTO.getNumberOfBathrooms());
+		
+		Booking saveBooking = bookingRepository.save(booking);
+		
+		for(AddOnDTO addon : bookingDTO.getAddOns()) {
+			AddOn obj = new AddOn();
+			obj.setBooking(saveBooking);
+			obj.setName(addon.getName());
+			obj.setPrice(addon.getPrice());
+			
+			addOnRepository.save(obj);
+		}
+		
+		return true;
+	}
+	
+	private void bookingFrequency(Booking booking, String frequency) {
+		switch (frequency.toLowerCase()) {
+		case "daily":
+			booking.setFrequency(RepeatFrequency.DAILY);
+			break;
+		case "weekly":
+			booking.setFrequency(RepeatFrequency.WEEKLY);
+			break;
+		case "fortnightly":
+			booking.setFrequency(RepeatFrequency.FORTNIGHTLY);
+			break;
+		case "monthly":
+			booking.setFrequency(RepeatFrequency.MONTHLY);
+			break;
+		}
+	}
 }
-
-
-
-
-
-
-
-
-
-
-

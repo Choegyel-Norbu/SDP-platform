@@ -16,10 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.personalAssist.SDP.dto.BookingDTO;
 import com.personalAssist.SDP.dto.ClientDTO;
+import com.personalAssist.SDP.dto.ReviewDTO;
 import com.personalAssist.SDP.dto.ServiceRequestDTO;
 import com.personalAssist.SDP.interfaces.ClientAddressProjection;
+import com.personalAssist.SDP.interfaces.ReviewProjection;
 import com.personalAssist.SDP.interfaces.ServiceRequestProjection;
+import com.personalAssist.SDP.model.Review;
 import com.personalAssist.SDP.model.ServiceRequest;
 import com.personalAssist.SDP.repository.ServiceRequestRepository;
 import com.personalAssist.SDP.service.ClientService;
@@ -147,4 +151,48 @@ public class ClientServiceController {
 	public ClientAddressProjection getClientAddressFromServiceId(@PathVariable Long serviceId) {
 		return clientService.getClientAddressFromServiceId(serviceId);
 	}
+	
+	@PostMapping("/clientReview/{clientId}")
+	public ResponseEntity<Review> clientReview(@RequestBody ReviewDTO reviewDTO, @PathVariable Long clientId){
+		Review review = clientService.clientReview(reviewDTO, clientId);
+		if(review != null) {
+			return ResponseEntity.ok(review);
+		}
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+
+	}
+	
+	@GetMapping("/getReviews")
+	public ResponseEntity<?> getReview(){
+		List<ReviewProjection> reviews = clientService.getReview();
+		if(!reviews.isEmpty()) {
+			return ResponseEntity.ok(reviews);
+		}
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+	}
+	
+	@DeleteMapping("/deleteReview/{reviewId}")
+	public void deleteReview(Long reviewId) {
+		clientService.deleteReview(reviewId);
+	}
+	
+	@PutMapping("/updateReview")
+	public ResponseEntity<Review> updateReview(ReviewDTO reviewDTO) {
+		Review review = clientService.updateReview(reviewDTO);
+		if(review != null) {
+			return ResponseEntity.ok(review);
+		}
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(null); 
+	}
+	
+	@PostMapping("/booking")
+	public ResponseEntity<?> scheduleBooking(@RequestBody BookingDTO dto) {
+		boolean booking = clientService.scheduleBooking(dto);
+		if(booking) {
+			return ResponseEntity.ok(booking);
+		}
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(false); 
+	}
+	
+	
 }

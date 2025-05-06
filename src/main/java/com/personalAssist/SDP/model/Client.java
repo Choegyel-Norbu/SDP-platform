@@ -27,6 +27,14 @@ public class Client {
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User user;
 
+	@OneToOne(mappedBy = "client", cascade = CascadeType.ALL)
+	private Review review;
+	
+	@OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval= true)
+	private List<Booking> bookings;
+
+	private boolean canReview;
+
 	public Client() {
 		super();
 	}
@@ -47,8 +55,24 @@ public class Client {
 		this.id = id;
 	}
 
+	public boolean isCanReview() {
+		return canReview;
+	}
+
+	public void setCanReview(boolean canReview) {
+		this.canReview = canReview;
+	}
+
 	public String getPhoneNumber() {
 		return phoneNumber;
+	}
+
+	public Review getReview() {
+		return review;
+	}
+
+	public void setReview(Review review) {
+		this.review = review;
 	}
 
 	public void setPhoneNumber(String phoneNumber) {

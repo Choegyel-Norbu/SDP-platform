@@ -44,10 +44,12 @@ public class ServiceRequest {
 	private String description;
 	private int rate;
 
-
 	@Column(columnDefinition = "TIMESTAMP")
 	private OffsetDateTime requestedDate;
-	
+
+	@OneToOne(mappedBy = "serviceRequest", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Booking booking;
+
 	private String serviceType;
 
 	@Enumerated(EnumType.STRING)
@@ -78,6 +80,13 @@ public class ServiceRequest {
 
 	public ServiceRequest() {
 		super();
+	}
+
+	public ServiceRequest(String serviceName, String description, String serviceType) {
+		super();
+		this.serviceName = serviceName;
+		this.description = description;
+		this.serviceType = serviceType;
 	}
 
 	public String getServiceType() {

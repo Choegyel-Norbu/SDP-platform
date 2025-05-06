@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 
 import com.personalAssist.SDP.model.ServiceStatus;
 
+import ch.qos.logback.core.net.server.Client;
+
 @Repository
 public interface ServiceStatusRepository extends JpaRepository<ServiceStatus, Long>{
 
@@ -15,5 +17,7 @@ public interface ServiceStatusRepository extends JpaRepository<ServiceStatus, Lo
 	
 	@Query(value = "SELECT * FROM service_status ss WHERE ss.status = :status", nativeQuery = true)
 	ServiceStatus fetchStatusByName(@Param("status") String status);
+	
+
 
 }

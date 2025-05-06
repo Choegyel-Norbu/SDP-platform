@@ -9,7 +9,9 @@ import org.springframework.stereotype.Repository;
 
 import com.personalAssist.SDP.interfaces.ClientAddressProjection;
 import com.personalAssist.SDP.interfaces.ServiceRequestProjection;
+import com.personalAssist.SDP.model.Client;
 import com.personalAssist.SDP.model.ServiceRequest;
+
 
 @Repository
 public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, Long> {
@@ -74,6 +76,10 @@ public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, 
 			+ "FROM service_request sr join service_status ss on ss.id = sr.status \n"
 			+ "ORDER BY requested_date ASC", nativeQuery = true)
 	List<ServiceRequestProjection> oldestDate();
+	
+	@Query(value = "select c.* from client c left join service_request sr on c.id = sr.client_id where sr.id = :serviceId"
+			+ "", nativeQuery = true)
+	Client findClientByServiceRequestId(@Param("serviceId") Long serviceId);
 	
 	
 }
