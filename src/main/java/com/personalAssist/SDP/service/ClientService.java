@@ -12,6 +12,7 @@ import com.personalAssist.SDP.interfaces.ReviewProjection;
 import com.personalAssist.SDP.interfaces.ServiceRequestProjection;
 import com.personalAssist.SDP.model.Review;
 import com.personalAssist.SDP.model.ServiceRequest;
+import com.personalAssist.SDP.util.DiscountResult;
 
 public interface ClientService {
 
@@ -49,6 +50,10 @@ public interface ClientService {
 
 	public boolean updateServiceStatus(Long serviceId, String status);
 	
-	public boolean scheduleBooking(BookingDTO bookngDTO);
+	public DiscountResult scheduleBooking(BookingDTO bookngDTO);
+	
+	public DiscountResult reviewBooking(BookingDTO dto);
+	
+	public boolean confirmBooking(Long id, String status);
 
 }

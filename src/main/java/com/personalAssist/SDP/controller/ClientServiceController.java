@@ -27,6 +27,7 @@ import com.personalAssist.SDP.model.Review;
 import com.personalAssist.SDP.model.ServiceRequest;
 import com.personalAssist.SDP.repository.ServiceRequestRepository;
 import com.personalAssist.SDP.service.ClientService;
+import com.personalAssist.SDP.util.DiscountResult;
 
 @RestController
 @RequestMapping("/api")
@@ -187,12 +188,20 @@ public class ClientServiceController {
 	
 	@PostMapping("/booking")
 	public ResponseEntity<?> scheduleBooking(@RequestBody BookingDTO dto) {
-		boolean booking = clientService.scheduleBooking(dto);
-		if(booking) {
+		DiscountResult booking = clientService.scheduleBooking(dto);
+		if(booking != null) {
 			return ResponseEntity.ok(booking);
 		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(false); 
 	}
 	
+	@PostMapping("/reviewBooking")
+	public ResponseEntity<?> reviewBooking(@RequestBody BookingDTO dto) {
+		DiscountResult booking = clientService.reviewBooking(dto);
+		if(booking != null) {
+			return ResponseEntity.ok(booking);
+		}
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(false); 
+	}
 	
 }

@@ -51,7 +51,11 @@ public class Booking {
 	@OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<AddOn> addOns;
 
-	private double subtotal;
+	@OneToOne
+	@JoinColumn(name="status_id", unique = true)
+	private ServiceStatus bookingStatus;
+	
+	private double AmountAfterDiscount;
 	private double discountAmount;
 	private double taxAmount;
 	private double totalAmount;
@@ -228,12 +232,13 @@ public class Booking {
 		this.addOns = addOns;
 	}
 
-	public double getSubtotal() {
-		return subtotal;
+	
+	public double getAmountAfterDiscount() {
+		return AmountAfterDiscount;
 	}
 
-	public void setSubtotal(double subtotal) {
-		this.subtotal = subtotal;
+	public void setAmountAfterDiscount(double amountAfterDiscount) {
+		AmountAfterDiscount = amountAfterDiscount;
 	}
 
 	public double getDiscountAmount() {

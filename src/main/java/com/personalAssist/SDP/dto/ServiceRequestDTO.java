@@ -20,6 +20,7 @@ public class ServiceRequestDTO {
 	private String priority;
 	private String repeatFrequency;
 	private String serviceType;
+	private double itemPrice;
 
 //	for customize response
 	private Priority responsePriority;
@@ -42,6 +43,14 @@ public class ServiceRequestDTO {
 		this.responsePriority = responsePriority;
 		this.responseFrequency = responseFrequency;
 		this.serviceType = serviceType;
+	}
+
+	public double getItemPrice() {
+		return itemPrice;
+	}
+
+	public void setItemPrice(double itemPrice) {
+		this.itemPrice = itemPrice;
 	}
 
 	public Priority getResponsePriority() {

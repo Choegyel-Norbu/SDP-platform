@@ -34,6 +34,7 @@ import com.personalAssist.SDP.repository.ReviewRepository;
 import com.personalAssist.SDP.repository.ServiceRequestRepository;
 import com.personalAssist.SDP.repository.ServiceStatusRepository;
 import com.personalAssist.SDP.repository.UserRepository;
+import com.personalAssist.SDP.util.DiscountResult;
 import com.personalAssist.SDP.util.UserWrapper;
 
 @Service
@@ -53,13 +54,13 @@ public class ClientServiceImpl implements ClientService {
 
 	@Autowired
 	ServiceStatusRepository serviceStatusRepository;
-	
+
 	@Autowired
 	ReviewRepository reviewRepository;
-	
+
 	@Autowired
 	BookingRepository bookingRepository;
-	
+
 	@Autowired
 	AddOnRepository addOnRepository;
 
@@ -258,12 +259,12 @@ public class ClientServiceImpl implements ClientService {
 	@Override
 	public Review clientReview(ReviewDTO reviewDTO, Long clientId) {
 		Client client = clientRepository.findById(clientId).orElse(null);
-		
+
 		Review review = new Review();
 		review.setClient(client);
 		review.setComment(reviewDTO.getComment());
 		review.setRating(reviewDTO.getRating());
-		
+
 		return reviewRepository.save(review);
 	}
 
@@ -282,17 +283,19 @@ public class ClientServiceImpl implements ClientService {
 		Review review = reviewRepository.findById(reviewDTO.getId()).orElse(null);
 		review.setComment(reviewDTO.getComment());
 		review.setRating(reviewDTO.getRating());
-			
+
 		return reviewRepository.save(review);
 	}
 
 	@Override
-	public boolean scheduleBooking(BookingDTO bookingDTO) {
+	public DiscountResult scheduleBooking(BookingDTO bookingDTO) {
 		Client client = clientRepository.loadClientByUserId(bookingDTO.getUserId());
 		Booking booking = new Booking();
-		
+		List<AddOn> dtoToAddOn = new ArrayList<>();
+
 		booking.setClient(client);
-		ServiceRequest service = serviceRequestRepository.save(UserWrapper.toServiceRequest(bookingDTO.getServiceRequest()));
+		ServiceRequest service = serviceRequestRepository
+				.save(UserWrapper.toServiceRequest(bookingDTO.getServiceRequest()));
 		booking.setServiceRequest(service);
 		bookingFrequency(booking, bookingDTO.getFrequency());
 		booking.setStatus(Status.PENDING);
@@ -301,21 +304,85 @@ public class ClientServiceImpl implements ClientService {
 		booking.setEndTime(bookingDTO.getEndTime());
 		booking.setNumberOfBedrooms(bookingDTO.getNumberOfBedrooms());
 		booking.setNumberOfBathrooms(bookingDTO.getNumberOfBathrooms());
-		
-		Booking saveBooking = bookingRepository.save(booking);
-		
-		for(AddOnDTO addon : bookingDTO.getAddOns()) {
-			AddOn obj = new AddOn();
-			obj.setBooking(saveBooking);
-			obj.setName(addon.getName());
-			obj.setPrice(addon.getPrice());
-			
-			addOnRepository.save(obj);
+
+		for (AddOnDTO addon : bookingDTO.getAddOns()) {
+			dtoToAddOn.add(UserWrapper.toAddOn(addon));
 		}
+
+		double totalAmount = calcTotalPrice(bookingDTO, dtoToAddOn);
+		booking.setTotalAmount(totalAmount);
+
+		booking.setAmountAfterDiscount(
+				totalAmount - calcDiscount(bookingDTO.getFrequency(), totalAmount).getDiscountedPrice());
+
+		Booking saveBooking = bookingRepository.save(booking);
+
+		for (AddOn addon : dtoToAddOn) {
+			addon.setBooking(booking);
+			addOnRepository.save(addon);
+		}
+		DiscountResult obj = calcDiscount(bookingDTO.getFrequency(), totalAmount);
+		obj.setAmountAfterDiscount(booking.getAmountAfterDiscount());
+		return obj;
+	}
+
+	@Override
+	public DiscountResult reviewBooking(BookingDTO dto) {
+		List<AddOn> dtoToAddOn = new ArrayList<>();
 		
-		return true;
+		for (AddOnDTO addon : dto.getAddOns()) {
+			dtoToAddOn.add(UserWrapper.toAddOn(addon));
+		}
+		double totalAmount = calcTotalPrice(dto, dtoToAddOn);
+		DiscountResult obj = calcDiscount(dto.getFrequency(), totalAmount);
+		obj.setAmountAfterDiscount(totalAmount - obj.getDiscountedPrice());
+		obj.setTotalAmount(totalAmount);
+		return obj;
 	}
 	
+	private double calcTotalPrice(BookingDTO booking, List<AddOn> addons) {
+		double totalAddOnAmount = 0;
+		for (AddOn addon : addons) {
+			totalAddOnAmount += addon.getPrice();
+		}
+		return booking.getServiceRequest().getItemPrice() + totalAddOnAmount;
+	}
+
+	private DiscountResult calcDiscount(String freq, double totalAmount) {
+		double discoutedPrice;
+		switch (freq.toLowerCase()) {
+		case "daily":
+			return new DiscountResult(0, "There is no discount for daily serivces");
+		case "weekly":
+			discoutedPrice = totalAmount * 0.15;
+			return new DiscountResult(discoutedPrice, "15% off for weekly service");
+		case "fortnightly":
+			discoutedPrice = totalAmount * 0.10;
+			return new DiscountResult(discoutedPrice, "10% off for fortnightly service");
+		case "monthly":
+			discoutedPrice = totalAmount * 0.05;
+			return new DiscountResult(discoutedPrice, "5% off for monthly service");
+		default:
+			return new DiscountResult(0, "No discount applied");
+		}
+
+	}
+
+	@Override
+	public boolean confirmBooking(Long id, String status) {
+		Booking booking = bookingRepository.findById(id).orElse(null);
+
+		switch (status.toLowerCase()) {
+		case ("approved"):
+			booking.setStatus(Status.CONFIRMED);
+			return true;
+		case ("cancelled"):
+			booking.setStatus(Status.CANCELLED);
+			return true;
+		}
+		return false;
+	}
+
 	private void bookingFrequency(Booking booking, String frequency) {
 		switch (frequency.toLowerCase()) {
 		case "daily":
@@ -332,4 +399,7 @@ public class ClientServiceImpl implements ClientService {
 			break;
 		}
 	}
+
+	
+
 }

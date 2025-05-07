@@ -19,6 +19,9 @@ public class ServiceStatus {
 
 	@OneToMany(mappedBy = "status", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ServiceRequest> serviceRequests;
+	
+	@OneToOne(mappedBy= "bookingStatus", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Booking booking;
 
 	public ServiceStatus(Status status) {
 		super();

@@ -7,7 +7,6 @@ public class BookingDTO {
 
 	private Long id;
 	private Long clientId;
-	private double itemPrice;
 	private Long userId;
 	private ServiceRequestDTO serviceRequest;
 	private OffsetDateTime bookingTime;
@@ -47,14 +46,6 @@ public class BookingDTO {
 
 	public Long getClientId() {
 		return clientId;
-	}
-
-	public double getItemPrice() {
-		return itemPrice;
-	}
-
-	public void setItemPrice(double itemPrice) {
-		this.itemPrice = itemPrice;
 	}
 
 	public void setClientId(Long clientId) {
