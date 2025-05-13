@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.google.api.client.util.Value;
 import com.personalAssist.SDP.enums.UserRole;
 
 import jakarta.persistence.CascadeType;
@@ -42,6 +43,10 @@ public class User {
 	@Column(nullable = false)
 	private String password;
 
+	private String googleName;
+	
+	private String googlePictureUrl;
+
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
 	private Client client;
 
@@ -56,6 +61,25 @@ public class User {
 
 	public Long getId() {
 		return id;
+	}
+	
+
+	public String getGooglePictureUrl() {
+		return googlePictureUrl;
+	}
+
+
+	public void setGooglePictureUrl(String googlePictureUrl) {
+		this.googlePictureUrl = googlePictureUrl;
+	}
+
+
+	public String getGoogleName() {
+		return googleName;
+	}
+
+	public void setGoogleName(String googleName) {
+		this.googleName = googleName;
 	}
 
 	public String getEmail() {

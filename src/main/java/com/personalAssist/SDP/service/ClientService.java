@@ -7,6 +7,7 @@ import com.personalAssist.SDP.dto.BookingDTO;
 import com.personalAssist.SDP.dto.ClientDTO;
 import com.personalAssist.SDP.dto.ReviewDTO;
 import com.personalAssist.SDP.dto.ServiceRequestDTO;
+import com.personalAssist.SDP.interfaces.BookingClientProjection;
 import com.personalAssist.SDP.interfaces.ClientAddressProjection;
 import com.personalAssist.SDP.interfaces.ReviewProjection;
 import com.personalAssist.SDP.interfaces.ServiceRequestProjection;
@@ -50,10 +51,15 @@ public interface ClientService {
 
 	public boolean updateServiceStatus(Long serviceId, String status);
 	
-	public DiscountResult scheduleBooking(BookingDTO bookngDTO);
+	public DiscountResult scheduleBooking(BookingDTO bookingDTO);
 	
 	public DiscountResult reviewBooking(BookingDTO dto);
 	
-	public boolean confirmBooking(Long id, String status);
+	public boolean updateBookingDetails(BookingDTO bookingDTO);
+	
+	public List<BookingClientProjection> getBookingsForClient(Long clientId);
 
+	public List<BookingClientProjection> getAllBookings();
+	
+	public boolean updateAdminBookingStatus(Long bookingId, String status, String cancellationReason);
 }

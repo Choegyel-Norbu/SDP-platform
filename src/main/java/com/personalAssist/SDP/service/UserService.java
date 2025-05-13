@@ -5,11 +5,8 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.personalAssist.SDP.dto.ClientDTO;
 import com.personalAssist.SDP.dto.UserDTO;
 import com.personalAssist.SDP.model.User;
-
-import ch.qos.logback.core.net.server.Client;
 
 @Component
 public interface UserService {
@@ -21,6 +18,7 @@ public interface UserService {
 	public Optional<User> updateUser(Long id, User updateUser);
 	public UserDTO addRole(String email, List<String> roleNames);
 	
+	public User verifyGoogleToken(String toTokenString);
 	
 }
 	

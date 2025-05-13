@@ -21,6 +21,7 @@ public class ServiceRequestDTO {
 	private String repeatFrequency;
 	private String serviceType;
 	private double itemPrice;
+	private LocalDateTime startTime;
 
 //	for customize response
 	private Priority responsePriority;
@@ -47,6 +48,14 @@ public class ServiceRequestDTO {
 
 	public double getItemPrice() {
 		return itemPrice;
+	}
+
+	public LocalDateTime getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(LocalDateTime startTime) {
+		this.startTime = startTime;
 	}
 
 	public void setItemPrice(double itemPrice) {

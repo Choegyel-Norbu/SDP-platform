@@ -15,6 +15,7 @@ import com.personalAssist.SDP.dto.ServiceRequestDTO;
 import com.personalAssist.SDP.enums.Priority;
 import com.personalAssist.SDP.enums.RepeatFrequency;
 import com.personalAssist.SDP.enums.Status;
+import com.personalAssist.SDP.interfaces.BookingClientProjection;
 import com.personalAssist.SDP.interfaces.ClientAddressProjection;
 import com.personalAssist.SDP.interfaces.ReviewProjection;
 import com.personalAssist.SDP.interfaces.ServiceRequestProjection;
@@ -298,12 +299,14 @@ public class ClientServiceImpl implements ClientService {
 				.save(UserWrapper.toServiceRequest(bookingDTO.getServiceRequest()));
 		booking.setServiceRequest(service);
 		bookingFrequency(booking, bookingDTO.getFrequency());
+
 		booking.setStatus(Status.PENDING);
 		booking.setSpecialInstructions(bookingDTO.getSpecialInstructions());
 		booking.setStartTime(bookingDTO.getStartTime());
 		booking.setEndTime(bookingDTO.getEndTime());
 		booking.setNumberOfBedrooms(bookingDTO.getNumberOfBedrooms());
 		booking.setNumberOfBathrooms(bookingDTO.getNumberOfBathrooms());
+		booking.setDiscountAmount(0);
 
 		for (AddOnDTO addon : bookingDTO.getAddOns()) {
 			dtoToAddOn.add(UserWrapper.toAddOn(addon));
@@ -312,8 +315,9 @@ public class ClientServiceImpl implements ClientService {
 		double totalAmount = calcTotalPrice(bookingDTO, dtoToAddOn);
 		booking.setTotalAmount(totalAmount);
 
-		booking.setAmountAfterDiscount(
-				totalAmount - calcDiscount(bookingDTO.getFrequency(), totalAmount).getDiscountedPrice());
+		double discountAmount = calcDiscount(bookingDTO.getFrequency(), totalAmount).getDiscountedPrice();
+		booking.setDiscountAmount(discountAmount);
+		booking.setAmountAfterDiscount(totalAmount - discountAmount);
 
 		Booking saveBooking = bookingRepository.save(booking);
 
@@ -329,7 +333,7 @@ public class ClientServiceImpl implements ClientService {
 	@Override
 	public DiscountResult reviewBooking(BookingDTO dto) {
 		List<AddOn> dtoToAddOn = new ArrayList<>();
-		
+
 		for (AddOnDTO addon : dto.getAddOns()) {
 			dtoToAddOn.add(UserWrapper.toAddOn(addon));
 		}
@@ -339,7 +343,7 @@ public class ClientServiceImpl implements ClientService {
 		obj.setTotalAmount(totalAmount);
 		return obj;
 	}
-	
+
 	private double calcTotalPrice(BookingDTO booking, List<AddOn> addons) {
 		double totalAddOnAmount = 0;
 		for (AddOn addon : addons) {
@@ -368,21 +372,6 @@ public class ClientServiceImpl implements ClientService {
 
 	}
 
-	@Override
-	public boolean confirmBooking(Long id, String status) {
-		Booking booking = bookingRepository.findById(id).orElse(null);
-
-		switch (status.toLowerCase()) {
-		case ("approved"):
-			booking.setStatus(Status.CONFIRMED);
-			return true;
-		case ("cancelled"):
-			booking.setStatus(Status.CANCELLED);
-			return true;
-		}
-		return false;
-	}
-
 	private void bookingFrequency(Booking booking, String frequency) {
 		switch (frequency.toLowerCase()) {
 		case "daily":
@@ -400,6 +389,52 @@ public class ClientServiceImpl implements ClientService {
 		}
 	}
 
-	
+	@Override
+	public List<BookingClientProjection> getBookingsForClient(Long userId) {
+		return bookingRepository.findBookingClientDetails(userId);
+	}
+
+	@Override
+	public boolean updateBookingDetails(BookingDTO bookingDTO) {
+		Booking booking = bookingRepository.findById(bookingDTO.getId()).orElse(null);
+
+		bookingFrequency(booking, bookingDTO.getFrequency());
+		booking.setStartTime(bookingDTO.getStartTime());
+		booking.setSpecialInstructions(bookingDTO.getSpecialInstructions());
+
+		return bookingRepository.save(booking) != null;
+	}
+
+	@Override
+	public List<BookingClientProjection> getAllBookings() {
+		return bookingRepository.getAllBookings();
+	}
+
+	@Override
+	public boolean updateAdminBookingStatus(Long bookingId, String status, String cancellationReason) {
+		Booking booking = bookingRepository.findById(bookingId).orElse(null);
+
+		return bookingRepository.save(bookingConfirmation(status, booking, cancellationReason)) != null;
+	}
+
+	public Booking bookingConfirmation(String status, Booking booking, String cancellationReason) {
+
+		switch (status.toLowerCase()) {
+		case ("cancelled"):
+			booking.setStatus(Status.CANCELLED);
+			booking.setCancellationReason(cancellationReason);
+			break;
+		case ("confirmed"):
+			booking.setStatus(Status.CONFIRMED);
+			break;
+		case ("completed"):
+			booking.setStatus(Status.COMPLETED);
+			break;
+		case ("assigned"):
+			booking.setStatus(Status.ASSIGNED);
+			break;
+		}
+		return booking;
+	}
 
 }

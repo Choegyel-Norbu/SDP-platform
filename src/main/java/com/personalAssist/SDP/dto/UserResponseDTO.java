@@ -7,6 +7,8 @@ public class UserResponseDTO {
 	private Long id;
 	private String email;
 	private UserRole role;
+	private String name;
+	private String pictureURL;
 
 	public Long getId() {
 		return id;
@@ -32,5 +34,20 @@ public class UserResponseDTO {
 		this.role = role;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getPictureURL() {
+		return pictureURL;
+	}
+
+	public void setPictureURL(String pictureURL) {
+		this.pictureURL = pictureURL;
+	}
 
 }
