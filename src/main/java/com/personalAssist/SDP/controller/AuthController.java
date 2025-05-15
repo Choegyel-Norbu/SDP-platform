@@ -81,6 +81,11 @@ public class AuthController {
 
 	@PostMapping("/sendOtp")
 	public ResponseEntity<String> sendOtp(@RequestParam String email) {
+		User user = userRepository.findByEmail(email);
+		if(user != null) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exits");
+		}
+		
 		emailService.generateOtpAndSendOtp(email);
 		return ResponseEntity.status(HttpStatus.CREATED).body("OTP sent to email: "+ email);
 	}
