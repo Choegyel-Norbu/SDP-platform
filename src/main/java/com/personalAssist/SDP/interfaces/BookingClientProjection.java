@@ -16,4 +16,5 @@ public interface BookingClientProjection {
     String getServiceType();
     String getSpecialInstructions();
     String getServiceName();
+    String getBookingID();
 }

@@ -62,4 +62,7 @@ public interface ClientService {
 	public List<BookingClientProjection> getAllBookings();
 	
 	public boolean updateAdminBookingStatus(Long bookingId, String status, String cancellationReason);
+	
+	public BookingClientProjection findBookigByBookingID(String bookingId);
+	
 }

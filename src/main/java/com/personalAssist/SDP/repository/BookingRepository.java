@@ -30,4 +30,21 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 			+ "	join users u on u.id = c.user_id\n"
 			, nativeQuery = true)
 	List<BookingClientProjection> getAllBookings();
+	
+	boolean existsByBookingId(String bookingId);
+	
+	@Query(value = "select b.id,sr.service_type, sr.service_name, b.booking_time, b.discount_amount, b.end_time, b.frequency, b.amount_after_discount ,\n"
+			+ "	b.start_time, b.status, b.special_instructions, b.booking_id \n"
+			+ "	from booking b \n"
+			+ "	join service_request sr on b.service_request_id = sr.id\n"
+			+ "	join client c on c.id = b.client_id\n"
+			+ "	join users u on u.id = c.user_id\n"
+			+ "	where b.booking_id = :bookingId", nativeQuery = true)
+	BookingClientProjection findBookigByBookingID(@Param("bookingId") String bookingId);
+	
+	@Query(value = "select count(*) from booking b \n"
+			+ "join client c on b.client_id = c.id\n"
+			+ "where c.id = :clientId AND b.status = 'COMPLETED'", nativeQuery = true)
+	int bookingCountForPromo(@Param("clientId") Long clientId);
+	
 }

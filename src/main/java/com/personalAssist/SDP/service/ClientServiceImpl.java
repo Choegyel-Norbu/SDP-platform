@@ -2,6 +2,7 @@ package com.personalAssist.SDP.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import com.personalAssist.SDP.repository.AddOnRepository;
 import com.personalAssist.SDP.repository.AddressRepository;
 import com.personalAssist.SDP.repository.BookingRepository;
 import com.personalAssist.SDP.repository.ClientRepository;
+import com.personalAssist.SDP.repository.PromoRepository;
 import com.personalAssist.SDP.repository.ReviewRepository;
 import com.personalAssist.SDP.repository.ServiceRequestRepository;
 import com.personalAssist.SDP.repository.ServiceStatusRepository;
@@ -64,6 +66,9 @@ public class ClientServiceImpl implements ClientService {
 
 	@Autowired
 	AddOnRepository addOnRepository;
+
+	@Autowired
+	PromoRepository promoRepository;
 
 	@Override
 	public boolean associateClient(ClientDTO clientDTO) {
@@ -369,7 +374,6 @@ public class ClientServiceImpl implements ClientService {
 		default:
 			return new DiscountResult(0, "No discount applied");
 		}
-
 	}
 
 	private void bookingFrequency(Booking booking, String frequency) {
@@ -417,6 +421,15 @@ public class ClientServiceImpl implements ClientService {
 		return bookingRepository.save(bookingConfirmation(status, booking, cancellationReason)) != null;
 	}
 
+	private String generateBookingId() {
+		String bookingId;
+
+		do {
+			bookingId = "BOOK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+		} while (bookingRepository.existsByBookingId(bookingId));
+		return bookingId;
+	}
+
 	public Booking bookingConfirmation(String status, Booking booking, String cancellationReason) {
 
 		switch (status.toLowerCase()) {
@@ -426,6 +439,7 @@ public class ClientServiceImpl implements ClientService {
 			break;
 		case ("confirmed"):
 			booking.setStatus(Status.CONFIRMED);
+			booking.setBookingId(generateBookingId());
 			break;
 		case ("completed"):
 			booking.setStatus(Status.COMPLETED);
@@ -436,5 +450,43 @@ public class ClientServiceImpl implements ClientService {
 		}
 		return booking;
 	}
+
+	public double roomCount(int bedroomCount, int bathroomCount, double total) {
+		int totalRooms = bedroomCount + bathroomCount;
+		return total * 0.01 * totalRooms;
+	}
+
+	@Override
+	public BookingClientProjection findBookigByBookingID(String bookingId) {
+		return bookingRepository.findBookigByBookingID(bookingId);
+
+	}
+
+	private String generatePromo(Long clientId) {
+		int bookingCount = bookingRepository.bookingCountForPromo(clientId);
+		String promo = "";
+		if (bookingCount == 4) {
+			do {
+				promo = "fREE20-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+			} while (promoRepository.existsPromo(promo));
+		}
+		return promo;
+	}
+
+//	public double roomCount(int badroomCount, int bathroomCount, double total) {
+//		double totalAmount = 0;
+//		if(badroomCount != 0)
+//		{
+//			for(int i=0; i<badroomCount; i++) {
+//				totalAmount += total * 0.01;
+//			}
+//		}
+//		if(bathroomCount != 0) {
+//			for(int i = 0; i<bathroomCount; i++) {
+//				totalAmount += total * 0.01;
+//			}
+//		}
+//		return totalAmount;
+//	}
 
 }

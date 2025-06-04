@@ -25,6 +25,9 @@ public class Booking {
 	@JoinColumn(name = "service_request_id", unique = true)
 	private ServiceRequest serviceRequest;
 
+	@Column(unique = true)
+	private String bookingId;
+
 	@CreationTimestamp
 	@Column(columnDefinition = "TIMESTAMP")
 	private OffsetDateTime bookingTime;
@@ -52,9 +55,9 @@ public class Booking {
 	private List<AddOn> addOns;
 
 	@OneToOne
-	@JoinColumn(name="status_id", unique = true)
+	@JoinColumn(name = "status_id", unique = true)
 	private ServiceStatus bookingStatus;
-	
+
 	private double AmountAfterDiscount;
 	private double discountAmount;
 	private double taxAmount;
@@ -78,6 +81,22 @@ public class Booking {
 
 	public Booking() {
 		super();
+	}
+
+	public String getBookingId() {
+		return bookingId;
+	}
+
+	public void setBookingId(String bookingId) {
+		this.bookingId = bookingId;
+	}
+
+	public ServiceStatus getBookingStatus() {
+		return bookingStatus;
+	}
+
+	public void setBookingStatus(ServiceStatus bookingStatus) {
+		this.bookingStatus = bookingStatus;
 	}
 
 	public OffsetDateTime getCreatedAt() {
@@ -232,7 +251,6 @@ public class Booking {
 		this.addOns = addOns;
 	}
 
-	
 	public double getAmountAfterDiscount() {
 		return AmountAfterDiscount;
 	}

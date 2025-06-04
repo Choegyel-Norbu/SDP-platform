@@ -244,4 +244,8 @@ public class ClientServiceController {
 		
 	}
 	
+	@GetMapping("/getBookingWithBookingId/{bookingId}")
+	public BookingClientProjection findBookigByBookingID(@PathVariable String bookingId) {
+		return clientService.findBookigByBookingID(bookingId);
+	}
 }

@@ -27,7 +27,7 @@ public class BookingDTO {
 	private String cancellationReason;
 	private int numberOfBedrooms;
 	private int numberOfBathrooms;
-
+	
 	public Long getId() {
 		return id;
 	}

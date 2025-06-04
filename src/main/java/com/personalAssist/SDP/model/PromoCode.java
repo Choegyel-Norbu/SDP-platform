@@ -25,6 +25,7 @@ public class PromoCode {
 
 	private int maxUses;
 	private int usedCount;
+	private boolean valid;
 
 	@OneToMany(mappedBy = "promoCode", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Booking> bookings;
@@ -104,7 +105,13 @@ public class PromoCode {
 	public void setBookings(List<Booking> bookings) {
 		this.bookings = bookings;
 	}
-	
-	
+
+	public boolean isValid() {
+		return valid;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
+	}
 
 }
