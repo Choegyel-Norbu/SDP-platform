@@ -8,12 +8,14 @@ import com.google.firebase.FirebaseOptions;
 import jakarta.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Configuration
 public class FirebaseConfig {
 
+    private static final Logger logger = LoggerFactory.getLogger(FirebaseConfig.class);
     private final Environment env;
 
     public FirebaseConfig(Environment env) {
@@ -23,32 +25,43 @@ public class FirebaseConfig {
     @PostConstruct
     public void init() {
         try {
-            FirebaseOptions options;
-            
-            if (env.matchesProfiles("prod")) {
-                // Production - use environment variable
-                String encodedCredentials = env.getRequiredProperty("FIREBASE_CONFIG_BASE64");
-                byte[] decodedBytes = Base64.getDecoder().decode(encodedCredentials);
-                InputStream credentialsStream = new ByteArrayInputStream(decodedBytes);
-                options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(credentialsStream))
-                    .build();
-            } else {
-                // Local development - use file
-                InputStream serviceAccount = getClass().getResourceAsStream("/firebase-service-account.json");
-                options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .build();
-            }
-
             if (FirebaseApp.getApps().isEmpty()) {
+                FirebaseOptions options = buildFirebaseOptions();
                 FirebaseApp.initializeApp(options);
-                System.out.println("✅ Firebase Initialized");
+                logger.info("✅ Firebase Initialized Successfully");
             }
-
         } catch (Exception e) {
-            System.err.println("❌ Firebase init failed: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("❌ Firebase initialization failed", e);
+            throw new IllegalStateException("Failed to initialize Firebase", e);
         }
+    }
+
+    private FirebaseOptions buildFirebaseOptions() throws Exception {
+        InputStream credentialsStream;
+        
+        if (isProduction()) {
+            String encodedCreds = env.getProperty("FIREBASE_CONFIG_BASE64");
+            if (encodedCreds == null || encodedCreds.isEmpty()) {
+                throw new IllegalStateException("Missing FIREBASE_CREDENTIALS_BASE64 environment variable");
+            }
+            credentialsStream = new ByteArrayInputStream(
+                Base64.getDecoder().decode(encodedCreds)
+            );
+        } else {
+            credentialsStream = getClass().getResourceAsStream("/firebase-service-account.json");
+            if (credentialsStream == null) {
+                throw new IllegalStateException("Firebase credentials file not found in resources");
+            }
+        }
+        
+        return FirebaseOptions.builder()
+            .setCredentials(GoogleCredentials.fromStream(credentialsStream))
+            .build();
+    }
+
+    private boolean isProduction() {
+        return env.getActiveProfiles().length > 0 && 
+               Arrays.stream(env.getActiveProfiles())
+                     .anyMatch(env -> env.equalsIgnoreCase("prod"));
     }
 }
