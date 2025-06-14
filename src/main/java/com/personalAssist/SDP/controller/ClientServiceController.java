@@ -81,7 +81,7 @@ public class ClientServiceController {
 		if (clientSet) {
 			return ResponseEntity.ok().body(clientSet);
 		}
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(clientSet);
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(clientSet);
 	}
 
 	@PostMapping("/serviceRequest")
@@ -91,7 +91,7 @@ public class ClientServiceController {
 		if (response) {
 			return ResponseEntity.ok().body("Success");
 		}
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("Failed");
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Failed");
 	}
 
 	@GetMapping("/getServicesForClient/{id}")

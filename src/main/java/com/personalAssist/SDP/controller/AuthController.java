@@ -13,9 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
 import com.personalAssist.SDP.dto.LoginRequestDTO;
 import com.personalAssist.SDP.dto.UserDTO;
 import com.personalAssist.SDP.dto.UserResponseDTO;
+import com.personalAssist.SDP.enums.UserRole;
 import com.personalAssist.SDP.model.User;
 import com.personalAssist.SDP.repository.UserRepository;
 import com.personalAssist.SDP.service.EmailService;
@@ -36,10 +39,10 @@ public class AuthController {
 
 	@Autowired
 	EmailService emailService;
-	
+
 	@Autowired
 	UserService userService;
-	
+
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDTO) {
 		User user = userRepository.findByEmail(loginRequestDTO.getEmail());
@@ -59,14 +62,14 @@ public class AuthController {
 		dto.setRole(user.getRole());
 		return ResponseEntity.ok(new LoginApiResponse(token, dto));
 	}
-	
+
 	@PostMapping("/google")
 	public ResponseEntity<?> gogleAuthLogin(@RequestBody Map<String, String> request) {
 		String googleToken = request.get("credential");
-		
+
 		User user = userService.verifyGoogleToken(googleToken);
-		if(user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Google token");
+		if (user == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Google token");
 		}
 		String token = JwtUtil.generateToken(user.getEmail());
 		UserResponseDTO dto = new UserResponseDTO();
@@ -75,19 +78,54 @@ public class AuthController {
 		dto.setRole(user.getRole());
 		dto.setName(user.getGoogleName());
 		dto.setPictureURL(user.getGooglePictureUrl());
-		
+
 		return ResponseEntity.ok(new LoginApiResponse(token, dto));
+	}
+
+	@PostMapping("/login_google")
+	public ResponseEntity<?> googleAuthFirebaseLogin(@RequestBody Map<String, String> request) {
+		String googleToken = request.get("idToken");
+		System.out.println("Token - "+ googleToken);
+
+		try {
+			FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(googleToken);
+			String email = decodedToken.getEmail();
+
+			User user = userRepository.findByEmail(email);
+			if (user == null) {
+				user.setEmail(email);
+				user.setPassword(null);
+				user.setGoogleName(decodedToken.getName());
+				user.setRole(UserRole.USER);
+				user.setGooglePictureUrl(decodedToken.getPicture());
+				userRepository.save(user);
+			}
+
+			String token = JwtUtil.generateToken(user.getEmail());
+			UserResponseDTO dto = new UserResponseDTO();
+			dto.setId(user.getId());
+			dto.setEmail(user.getEmail());
+			dto.setRole(user.getRole());
+			dto.setName(user.getGoogleName());
+			dto.setPictureURL(user.getGooglePictureUrl());
+
+			return ResponseEntity.ok(new LoginApiResponse(token, dto));
+
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Firebase token");
+
+		}
 	}
 
 	@PostMapping("/sendOtp")
 	public ResponseEntity<String> sendOtp(@RequestParam String email) {
-		User user = userRepository.findByEmail(email);
-		if(user != null) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exits");
-		}
-		
+//		User user = userRepository.findByEmail(email);
+//		if(user != null) {
+//			return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exits");
+//		}
+//		
 		emailService.generateOtpAndSendOtp(email);
-		return ResponseEntity.status(HttpStatus.CREATED).body("OTP sent to email: "+ email);
+		return ResponseEntity.status(HttpStatus.CREATED).body("OTP sent to email: " + email);
 	}
 
 	@PostMapping("/verifyOtp")
@@ -97,7 +135,23 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired OTP.");
 
 		}
-		return ResponseEntity.ok(true);
+		User user = userRepository.findByEmail(email);
+		String token = JwtUtil.generateToken(user.getEmail());
+		UserResponseDTO dto = new UserResponseDTO();
+		dto.setId(user.getId());
+		dto.setEmail(user.getEmail());
+		dto.setRole(user.getRole());
+		return ResponseEntity.ok(new LoginApiResponse(token, dto));
 	}
+
+//	@PostMapping("/verifyOtp")
+//	public ResponseEntity<?> verifyOtp(@RequestParam String email, @RequestParam String otp) {
+//		boolean isValid = emailService.validateOtp(email, otp);
+//		if (!isValid) {
+//			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired OTP.");
+//
+//		}
+//		return ResponseEntity.ok(true);
+//	}
 
 }
