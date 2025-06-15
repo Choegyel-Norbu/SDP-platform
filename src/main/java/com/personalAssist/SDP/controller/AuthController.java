@@ -1,12 +1,10 @@
 package com.personalAssist.SDP.controller;
 
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
 import com.personalAssist.SDP.dto.LoginRequestDTO;
-import com.personalAssist.SDP.dto.UserDTO;
 import com.personalAssist.SDP.dto.UserResponseDTO;
 import com.personalAssist.SDP.enums.UserRole;
 import com.personalAssist.SDP.model.User;
@@ -25,10 +22,8 @@ import com.personalAssist.SDP.service.EmailService;
 import com.personalAssist.SDP.service.UserService;
 import com.personalAssist.SDP.util.JwtUtil;
 import com.personalAssist.SDP.util.PasswordEncoder;
-import com.personalAssist.SDP.util.UserWrapper;
 import com.personalAssist.SDP.wrapper.LoginApiResponse;
 
-import classes.GoogleAuthRequest;
 
 @RestController
 @RequestMapping("/auth")
@@ -93,10 +88,12 @@ public class AuthController {
 
 			User user = userRepository.findByEmail(email);
 			if (user == null) {
+				user = new User();
 				user.setEmail(email);
-				user.setPassword(null);
+				user.setPassword("Default-password");
 				user.setGoogleName(decodedToken.getName());
 				user.setRole(UserRole.USER);
+				user.setRegisterFlag(true);
 				user.setGooglePictureUrl(decodedToken.getPicture());
 				userRepository.save(user);
 			}
@@ -107,6 +104,7 @@ public class AuthController {
 			dto.setEmail(user.getEmail());
 			dto.setRole(user.getRole());
 			dto.setName(user.getGoogleName());
+			dto.setRegisterFlag(user.isRegisterFlag());
 			dto.setPictureURL(user.getGooglePictureUrl());
 
 			return ResponseEntity.ok(new LoginApiResponse(token, dto));
@@ -136,11 +134,20 @@ public class AuthController {
 
 		}
 		User user = userRepository.findByEmail(email);
-		String token = JwtUtil.generateToken(user.getEmail());
+		if(user == null) {
+			user = new User();
+			user.setEmail(email);
+			user.setPassword("Default-password");
+			user.setRole(UserRole.USER);
+			user.setRegisterFlag(false);
+			userRepository.save(user);
+		}
+		String token = JwtUtil.generateToken(email);
 		UserResponseDTO dto = new UserResponseDTO();
 		dto.setId(user.getId());
 		dto.setEmail(user.getEmail());
 		dto.setRole(user.getRole());
+		dto.setRegisterFlag(user.isRegisterFlag());
 		return ResponseEntity.ok(new LoginApiResponse(token, dto));
 	}
 

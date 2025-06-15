@@ -10,13 +10,18 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import com.personalAssist.SDP.model.EmailOTP;
+import com.personalAssist.SDP.model.User;
 import com.personalAssist.SDP.repository.EmailOTPRepository;
+import com.personalAssist.SDP.repository.UserRepository;
 
 @Service
 public class EmailService {
 	
 	@Autowired
 	private JavaMailSender mailSender;
+	
+	@Autowired
+	private UserRepository userRepository;
 	
 	@Autowired
 	EmailOTPRepository emailOtpRepository;
@@ -45,7 +50,7 @@ public class EmailService {
 	}
 	
 	public boolean validateOtp(String email, String otp) {
-        Optional<EmailOTP> otpOptional = emailOtpRepository.findByEmailAndOtp(email, otp);
+		Optional<EmailOTP> otpOptional = emailOtpRepository.findByEmailAndOtp(email, otp);
 
         if (otpOptional.isPresent()) {
             EmailOTP emailOTP = otpOptional.get();
