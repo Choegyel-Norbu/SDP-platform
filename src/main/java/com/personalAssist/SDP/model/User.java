@@ -44,8 +44,10 @@ public class User {
 	private String password;
 
 	private String googleName;
-	
+
 	private String googlePictureUrl;
+
+	private boolean registerFlag;
 
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
 	private Client client;
@@ -62,17 +64,22 @@ public class User {
 	public Long getId() {
 		return id;
 	}
-	
+
+	public boolean isRegisterFlag() {
+		return registerFlag;
+	}
+
+	public void setRegisterFlag(boolean registerFlag) {
+		this.registerFlag = registerFlag;
+	}
 
 	public String getGooglePictureUrl() {
 		return googlePictureUrl;
 	}
 
-
 	public void setGooglePictureUrl(String googlePictureUrl) {
 		this.googlePictureUrl = googlePictureUrl;
 	}
-
 
 	public String getGoogleName() {
 		return googleName;

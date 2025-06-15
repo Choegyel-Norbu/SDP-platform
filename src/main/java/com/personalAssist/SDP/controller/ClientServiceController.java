@@ -41,7 +41,7 @@ public class ClientServiceController {
 
 	@Autowired
 	ServiceRequestRepository serviceRepository;
-	
+
 	@Autowired
 	BookingRepository bookingRepository;
 
@@ -223,27 +223,28 @@ public class ClientServiceController {
 		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(false);
 	}
-	
+
 	@GetMapping("/getBookings")
 	public List<BookingClientProjection> getAllBookings() {
 		return clientService.getAllBookings();
 	}
-	
+
 	@PutMapping("/bookingConfirmation/{bookingId}")
-	public ResponseEntity<?> updateAdminBookingStatus(@PathVariable Long bookingId, @RequestParam("status") String status, @RequestBody String cancellationReason){
+	public ResponseEntity<?> updateAdminBookingStatus(@PathVariable Long bookingId,
+			@RequestParam("status") String status, @RequestBody String cancellationReason) {
 		if ("cancelled".equalsIgnoreCase(status) && (cancellationReason == null || cancellationReason.isBlank())) {
-	        return ResponseEntity.badRequest().body("Cancellation reason is required when status is 'cancelled'");
-	    }
-		
+			return ResponseEntity.badRequest().body("Cancellation reason is required when status is 'cancelled'");
+		}
+
 		Boolean res = clientService.updateAdminBookingStatus(bookingId, status, cancellationReason);
-		
+
 		if (res) {
 			return ResponseEntity.ok("Booking status updated successfully.");
 		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(false);
-		
+
 	}
-	
+
 	@GetMapping("/getBookingWithBookingId/{bookingId}")
 	public BookingClientProjection findBookigByBookingID(@PathVariable String bookingId) {
 		return clientService.findBookigByBookingID(bookingId);

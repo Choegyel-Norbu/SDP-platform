@@ -8,6 +8,7 @@ public class UserResponseDTO {
 	private String email;
 	private UserRole role;
 	private String name;
+	private boolean registerFlag;
 	private String pictureURL;
 
 	public Long getId() {
@@ -16,6 +17,14 @@ public class UserResponseDTO {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public boolean isRegisterFlag() {
+		return registerFlag;
+	}
+
+	public void setRegisterFlag(boolean registerFlag) {
+		this.registerFlag = registerFlag;
 	}
 
 	public String getEmail() {
