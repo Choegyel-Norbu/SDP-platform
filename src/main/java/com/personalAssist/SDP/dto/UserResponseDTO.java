@@ -10,6 +10,7 @@ public class UserResponseDTO {
 	private String name;
 	private boolean registerFlag;
 	private String pictureURL;
+	private boolean detailSet;
 
 	public Long getId() {
 		return id;
@@ -25,6 +26,14 @@ public class UserResponseDTO {
 
 	public void setRegisterFlag(boolean registerFlag) {
 		this.registerFlag = registerFlag;
+	}
+
+	public boolean isDetailSet() {
+		return detailSet;
+	}
+
+	public void setDetailSet(boolean detailSet) {
+		this.detailSet = detailSet;
 	}
 
 	public String getEmail() {

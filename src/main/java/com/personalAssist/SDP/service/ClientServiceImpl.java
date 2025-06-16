@@ -72,16 +72,23 @@ public class ClientServiceImpl implements ClientService {
 
 	@Override
 	public boolean associateClient(ClientDTO clientDTO) {
+		Long id = clientDTO.getUserId();
 		User user = userRepository.findById(clientDTO.getUserId()).orElse(null);
-		Client client = new Client();
-		client.setFirstName(clientDTO.getFirstName());
-		client.setLastName(clientDTO.getLastName());
-		client.setPhoneNumber(clientDTO.getPhoneNumber());
-		client.setUser(user);
-		client.setAddress(saveAddress(clientDTO.getAddressDTO()));
+		if(user == null) return false;
+		
+		Client client = clientRepository.loadClientByUserId(clientDTO.getUserId());
+		if(client == null) {
+			client = new Client();
+			client.setFirstName(clientDTO.getFirstName());
+			client.setLastName(clientDTO.getLastName());
+			client.setPhoneNumber(clientDTO.getPhoneNumber());
+			client.setUser(user);
+			client.setAddress(saveAddress(clientDTO.getAddressDTO()));
 
-		Client savedClient = clientRepository.save(client);
-		return savedClient != null;
+			Client savedClient = clientRepository.save(client);
+			return savedClient != null;
+		}
+		return false;
 	}
 
 	@Override
