@@ -52,7 +52,7 @@ public class ClientServiceController {
 		if (client) {
 			return ResponseEntity.ok().body("Success");
 		}
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("Failed");
+		return ResponseEntity.status(HttpStatus.CONFLICT).body("The client already exist");
 	}
 
 	@PutMapping("/updateClient")

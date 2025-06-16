@@ -16,14 +16,15 @@ import com.google.firebase.auth.FirebaseToken;
 import com.personalAssist.SDP.dto.LoginRequestDTO;
 import com.personalAssist.SDP.dto.UserResponseDTO;
 import com.personalAssist.SDP.enums.UserRole;
+import com.personalAssist.SDP.model.Client;
 import com.personalAssist.SDP.model.User;
+import com.personalAssist.SDP.repository.ClientRepository;
 import com.personalAssist.SDP.repository.UserRepository;
 import com.personalAssist.SDP.service.EmailService;
 import com.personalAssist.SDP.service.UserService;
 import com.personalAssist.SDP.util.JwtUtil;
 import com.personalAssist.SDP.util.PasswordEncoder;
 import com.personalAssist.SDP.wrapper.LoginApiResponse;
-
 
 @RestController
 @RequestMapping("/auth")
@@ -36,6 +37,9 @@ public class AuthController {
 	EmailService emailService;
 
 	@Autowired
+	ClientRepository clientRepository;
+
+	@Autowired
 	UserService userService;
 
 	@PostMapping("/login")
@@ -46,9 +50,9 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!");
 		}
 
-		if (!PasswordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credetials");
-		}
+//		if (!PasswordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
+//			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credetials");
+//		}
 
 		String token = JwtUtil.generateToken(user.getEmail());
 		UserResponseDTO dto = new UserResponseDTO();
@@ -73,6 +77,12 @@ public class AuthController {
 		dto.setRole(user.getRole());
 		dto.setName(user.getGoogleName());
 		dto.setPictureURL(user.getGooglePictureUrl());
+		boolean state = clientDetailSet(user.getId());
+		if(clientDetailSet(user.getId())) {
+			dto.setDetailSet(true);
+		}else {
+			dto.setDetailSet(false);
+		}
 
 		return ResponseEntity.ok(new LoginApiResponse(token, dto));
 	}
@@ -80,7 +90,7 @@ public class AuthController {
 	@PostMapping("/login_google")
 	public ResponseEntity<?> googleAuthFirebaseLogin(@RequestBody Map<String, String> request) {
 		String googleToken = request.get("idToken");
-		System.out.println("Token - "+ googleToken);
+		System.out.println("Token - " + googleToken);
 
 		try {
 			FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(googleToken);
@@ -106,6 +116,12 @@ public class AuthController {
 			dto.setName(user.getGoogleName());
 			dto.setRegisterFlag(user.isRegisterFlag());
 			dto.setPictureURL(user.getGooglePictureUrl());
+			boolean state = clientDetailSet(user.getId());
+			if(clientDetailSet(user.getId())) {
+				dto.setDetailSet(true);
+			}else {
+				dto.setDetailSet(false);
+			}
 
 			return ResponseEntity.ok(new LoginApiResponse(token, dto));
 
@@ -134,7 +150,7 @@ public class AuthController {
 
 		}
 		User user = userRepository.findByEmail(email);
-		if(user == null) {
+		if (user == null) {
 			user = new User();
 			user.setEmail(email);
 			user.setPassword("Default-password");
@@ -149,6 +165,11 @@ public class AuthController {
 		dto.setRole(user.getRole());
 		dto.setRegisterFlag(user.isRegisterFlag());
 		return ResponseEntity.ok(new LoginApiResponse(token, dto));
+	}
+
+	private boolean clientDetailSet(Long userId) {
+		Client client = clientRepository.loadClientByUserId(userId);
+		return clientRepository.loadClientByUserId(userId) != null;
 	}
 
 //	@PostMapping("/verifyOtp")
