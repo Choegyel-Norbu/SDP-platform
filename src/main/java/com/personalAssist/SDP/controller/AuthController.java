@@ -114,9 +114,8 @@ public class AuthController {
 			dto.setEmail(user.getEmail());
 			dto.setRole(user.getRole());
 			dto.setName(user.getGoogleName());
-			dto.setRegisterFlag(user.isRegisterFlag());
+			dto.setRegisterFlag(true);
 			dto.setPictureURL(user.getGooglePictureUrl());
-			boolean state = clientDetailSet(user.getId());
 			if(clientDetailSet(user.getId())) {
 				dto.setDetailSet(true);
 			}else {
@@ -163,23 +162,18 @@ public class AuthController {
 		dto.setId(user.getId());
 		dto.setEmail(user.getEmail());
 		dto.setRole(user.getRole());
-		dto.setRegisterFlag(user.isRegisterFlag());
+		dto.setRegisterFlag(false);
+		if(clientDetailSet(user.getId())) {
+			dto.setDetailSet(true);
+		}else {
+			dto.setDetailSet(false);
+		}
 		return ResponseEntity.ok(new LoginApiResponse(token, dto));
 	}
 
 	private boolean clientDetailSet(Long userId) {
-		Client client = clientRepository.loadClientByUserId(userId);
 		return clientRepository.loadClientByUserId(userId) != null;
 	}
 
-//	@PostMapping("/verifyOtp")
-//	public ResponseEntity<?> verifyOtp(@RequestParam String email, @RequestParam String otp) {
-//		boolean isValid = emailService.validateOtp(email, otp);
-//		if (!isValid) {
-//			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired OTP.");
-//
-//		}
-//		return ResponseEntity.ok(true);
-//	}
 
 }
